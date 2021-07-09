@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="E:\ConverBiz\Android\POYM\app\libs\YouTubeAndroidPlayerApi.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="28.0.3"
+        sha1="3c4f96ff493456651cc7bdb0b47e10eb25545a16">
+        <dex dex="E:\ConverBiz\Android\POYM\app\build\intermediates\transforms\dex\debug\folders\1000\2\YouTubeAndroidPlayerApi_51401f219da89ccd6c7b2501f82c26b2067a35b5\classes.dex" />
+    </item>
+
+</items>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <FrameLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".Patroling.Patroling_Activity" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:id="@+id/fetch_start"
+                android:text="start"
+                android:fontFamily="@font/lato"
+                android:layout_height="wrap_content" />
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/lato"
+                android:id="@+id/fetch_end"
+                android:text="end"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_margin="2dp"
+        android:layout_height="wrap_content">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="0.3"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:fontFamily="@font/lato"
+                    android:text="slno"
+                    android:id="@+id/exe_slno"
+                    android:textColor="@color/black_color"
+                    android:layout_height="match_parent" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/lato"
+                    android:textSize="14sp"
+                    android:paddingLeft="10dp"
+                    android:text="location"
+                    android:maxLines="2"
+                    android:gravity="center_vertical"
+                    android:id="@+id/exe_location"
+                    android:textColor="@color/black_color"
+                    android:layout_height="match_parent" />
+                <!--<TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:maxLines="1"
+                    android:gravity="center"
+                    android:text="address"
+                    android:id="@+id/exe_address"
+                    android:textColor="@color/black_color"
+                    android:layout_height="match_parent" />-->
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_weight="0.3"
+                    android:id="@+id/showimage"
+                    android:src="@drawable/ic_shg_pink"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

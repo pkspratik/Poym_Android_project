@@ -1,0 +1,190 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <com.example.kanthi.projectmonitoring.Distance_cam.Helper.PreviewSurfaceView
+        android:id="@+id/camera_preview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/circle_orange" />
+
+            <TextView
+                android:id="@+id/enter_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:padding="10dp"
+                android:textColor="@color/red" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/compass_angle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/red"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/circleoutline" />
+
+            <TextView
+                android:id="@+id/mark_this_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:padding="10dp"
+                android:text="Initialize"
+                android:textColor="@color/red" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/compass_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/compass" />
+
+            <ImageView
+                android:id="@+id/compass"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_centerInParent="true"
+                android:padding="10dp"
+                android:src="@drawable/compass_rotation" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!--<ImageView
+        android:id="@+id/drawer_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        app:srcCompat="@drawable/ic_menu_options" />-->
+
+    <ImageView
+        android:id="@+id/target_center"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_centerInParent="true"
+        app:srcCompat="@drawable/ic_square_targeting_interface_symbol_white" />
+
+    <View
+        android:id="@+id/cover_top_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignTop="@id/camera_preview_view"
+        android:background="@android:color/white" />
+
+
+    <ImageView
+        android:id="@+id/flash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:padding="10dp"
+        android:src="@drawable/ic_flash_off_white_24dp" />
+
+    <LinearLayout
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom_layout"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/height_background"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Height"
+            android:id="@+id/height_text"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/object_height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom_layout"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/height_background"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Distance"
+            android:id="@+id/distance_text"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/distance_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

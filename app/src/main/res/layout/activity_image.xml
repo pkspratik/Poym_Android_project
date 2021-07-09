@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        tools:context="com.example.distancecamera.ImageActivity">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <ImageView
+            android:id="@+id/image_iv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/height_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tags_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:padding="10dp"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/vision_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/tags_tv"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/vision_tags"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/distance_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+        <!--<Button
+            android:id="@+id/share_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
+            android:drawableTop="@drawable/ic_share"
+            android:text="Share"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />-->
+
+        <RelativeLayout
+            android:id="@+id/compass_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/north_text"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/compass" />
+
+            <ImageView
+                android:id="@+id/compass"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/compass_rotation" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/height_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Height"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Time"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/distance_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Distance"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/progress_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@drawable/gradient_full"
+        android:clickable="true">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+</RelativeLayout>

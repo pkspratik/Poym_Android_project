@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_margin="2dp"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            android:background="@color/ligray"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:fontFamily="@font/lato"
+                android:text="MapPartner"
+                android:id="@+id/mappartner"
+                android:gravity="center"
+                android:textColor="@color/black_color"
+                android:layout_height="match_parent" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="R.QTY"
+                android:id="@+id/res_qty"
+                android:textSize="12sp"
+                android:fontFamily="@font/lato"
+                android:gravity="center"
+                android:textColor="@color/black_color"
+                android:layout_height="match_parent" />
+            <EditText
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:hint="A.QTY"
+                android:id="@+id/act_qty"
+                android:textSize="14sp"
+                android:fontFamily="@font/lato"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:gravity="center"
+                android:visibility="gone"
+                android:textColor="@color/black_color"
+                android:layout_height="match_parent" />
+            <CheckBox
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:text="Approved"
+                android:maxLines="1"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/black_color"
+                android:layout_height="wrap_content"
+                android:id="@+id/cb_resource_approved"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/datelayout"
+            android:visibility="gone"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/lato"
+                android:id="@+id/qa_date"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

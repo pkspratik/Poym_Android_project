@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_details"
+        android:orderInCategory="1"
+        android:title="Survey"
+        android:icon="@drawable/ic_create_black_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="2"
+        android:title="Refresh"
+        android:icon="@drawable/ic_autorenew_black_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_statusupdate"
+        android:orderInCategory="3"
+        android:title="Status Update"
+        android:icon="@drawable/new_statushover"
+        app:showAsAction="ifRoom" />
+</menu>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#ff4081</color>
+    <color name="black_color">#050002</color>
+    <color name="white_color">#FFFFFEFE</color>
+    <color name="color_primary">#e72e5a</color>
+    <color name="title_text_color">#4a4d72</color>
+    <color name="darkyellow">#F5A700</color>
+    <color name="yellow">#F5B400</color>
+    <color name="blue">#3F51B5</color>
+    <color name="lite_gray">#e0e0d1</color>
+    <color name="gray">#c1c1a4</color>
+    <color name="ligray">#F2F2F2</color>
+    <color name="litgray">#efebeb</color>
+    <color name="green">#15ce15</color>
+    <color name="red">#ea1725</color>
+    <color name="liteblue">#6c7ee6</color>
+    <color name="lite_white">#b9c0e6</color>
+    <color name="u_blue">#254C73</color>
+    <color name="boq">#FF484F</color>
+    <color name="grey">#626262</color>
+
+
+    <color name="chartblue">#8f8fda</color>
+    <color name="chartred">#f05c66</color>
+    <color name="chartgreen">#5cd65c</color>
+    <color name="chartyellow">#cccc00</color>
+    <color name="chartgray">#df21c9</color>
+    <color name="chartorange">#e69500</color>
+    <color name="chartbrown">#75a3a3</color>
+    <color name="chartviolet">#a45ba4</color>
+
+    <color name="poym">#492a7a</color>
+    <color name="poymyellow">#ffba0e</color>
+    <color name="welcome_color">#2b2f36</color>
+    <color name="signi_in_color">#939fb5</color>
+    <color name="tab_color">#e6e6e6</color>
+    <color name="bottom_purple">#441887</color>
+
+</resources>

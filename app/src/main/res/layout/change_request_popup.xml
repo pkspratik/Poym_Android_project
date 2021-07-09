@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!--<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="0.8"
+            android:paddingLeft="4dp"
+            android:text="ChangeReq.No :"
+            android:textSize="18sp"
+            android:textColor="@color/black_color" />
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:id="@+id/et_chagereq_no"
+            android:layout_height="wrap_content" />
+        </LinearLayout>-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="0dp"
+            android:paddingLeft="4dp"
+            android:layout_height="match_parent"
+            android:paddingBottom="2dp"
+            android:gravity="center_vertical"
+            android:text="ItemsToChange:"
+            android:maxLines="1"
+            android:textColor="#000"
+            android:textSize="18sp"
+            android:layout_weight="1.7"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="2"
+            android:background="@drawable/spinner_border"
+            android:layout_marginLeft="5dp">
+            <Spinner
+                android:id="@+id/sp_itemtochange"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:descendantFocusability="blocksDescendants"
+                android:drawSelectorOnTop="true"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:paddingBottom="2dp"
+            android:text="Priority :"
+            android:paddingLeft="4dp"
+            android:gravity="center_vertical"
+            android:textColor="#000"
+            android:textSize="18sp"
+            android:layout_weight="1.7"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="2"
+            android:background="@drawable/spinner_border"
+            android:layout_marginLeft="5dp">
+            <Spinner
+                android:id="@+id/sp_priority"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:descendantFocusability="blocksDescendants"
+                android:drawSelectorOnTop="true"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:paddingTop="10dp"
+        android:layout_height="80dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="0.8"
+            android:text="Description :"
+            android:paddingLeft="4dp"
+            android:textSize="18sp"
+            android:textColor="@color/black_color" />
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/et_description"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content">
+        <Button
+            android:layout_width="wrap_content"
+            android:text="save"
+            android:id="@+id/change_save"
+            android:layout_marginRight="20dp"
+            android:layout_height="wrap_content" />
+        <Button
+            android:layout_width="wrap_content"
+            android:text="cancel"
+            android:id="@+id/change_cancel"
+            android:layout_marginLeft="10dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

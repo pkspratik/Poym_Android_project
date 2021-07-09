@@ -1,0 +1,101 @@
+<resources>
+    <string name="app_name">Poym</string>
+    <string name="welcome">Welcome,</string>
+    <string name="sign_in_to_continue">Sign in to continue</string>
+    <string name="username">Username</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="password">Password</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login">Sign In</string>
+    <string name="field_engineer">Field Engineer</string>
+    <string name="sterlite">Project</string>
+    <string name="location">Link Id</string>
+    <string name="desigination">Location</string>
+    <string name="logging_in">LoggingIn..</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="empty_username">Empty UserName</string>
+    <string name="empty_password">Empty Password</string>
+    <string name="access_denied">Clear App Data</string>
+    <string name="prev_day">Previous Day</string>
+    <string name="invalid_username">Invalid User Name</string>
+    <string name="invalid_password">Invalid Password</string>
+    <string name="internal_error">Internal Error</string>
+    <string name="contact_facility">Contact Admin</string>
+
+    <style name="normal_text_views">
+        <item name="android:textColor">@color/title_text_color</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <string name="title_activity_landing">LandingActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="logout_confirm">Confirm Logout</string>
+    <string name="title_activity_map_screen">Map</string>
+    <string name="capture_image">Progress</string>
+    <string name="click_to_take_picture">Click to take picture</string>
+    <string name="task_name">Task Name</string>
+    <string name="submit">submit</string>
+    <string name="task_type">Task Type</string>
+    <string name="status">Status</string>
+    <string name="importance">Importance</string>
+    <string name="complete">%Complete</string>
+    <string name="remark">remark</string>
+    <string name="Remark">Remark</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="press_ok">Would you like to mark your attendence.Press Ok</string>
+    <string name="attendence">Attendence</string>
+    <string name="select_condition">Select</string>
+    <string name="select_parameter">Parameter</string>
+    <string name="select_checklist">Checklist</string>
+    <string name="title_activity_survey">Map</string>
+    <string name="Rs">Rs</string>
+    <string name="title_activity_progress_view">Map</string>
+    <string name="check_internet">No internet connection!</string>
+    <string name="date_month">dd MMMM</string>
+
+
+    <string-array name="input_units">
+        <item>Metre</item>
+        <item>Centimetre</item>
+        <item>Feet</item>
+        <item>Inch</item>
+    </string-array>
+    <string name="metre">Metre</string>
+    <string name="centi_metre">Centimetre</string>
+    <string name="inch">Inch</string>
+    <string name="feet">Feet</string>
+    <string name="title_activity_patroling_">Map</string>
+    <string name="check_groupid">Please,check Groupid</string>
+    <string name="no_data">No Data Found</string>
+    <string name="check_network">No Internet,Please check your Connection</string>
+    <string name="check_network_for_push_data">Connect to Internet</string>
+    <string name="get_data1">get data</string>
+    <string name="success1">success</string>
+    <string name="push_data1">Push Data</string>
+    <string name="writing_data">Writing Data,Please Wait</string>
+    <string name="fetching_data">Fetching data,Please Wait..</string>
+    <string name="push_data">Push Data</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="progress_view">Progress View</string>
+    <string name="survey_execution">Survey Execution</string>
+    <string name="project_execution">Project Execution</string>
+    <string name="qualitycheck">QualityCheck</string>
+    <string name="projectrisk">ProjectRisk</string>
+    <string name="changerequest">ChangeRequest</string>
+    <string name="patroling">Patroling</string>
+    <string name="logout">Logout</string>
+    <string name="mapbox_access_token">pk.eyJ1Ijoia2FudGhpLW5hbGFtYXRpIiwiYSI6ImNrOWIwbGo2ZDAwNTQzcHBsbzBuM3VlZGQifQ.XuOEflFbbngFmovtnaxkmQ</string>
+    <string name="end_progress_success">Map Download success</string>
+</resources>

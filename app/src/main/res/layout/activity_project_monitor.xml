@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:padding="2dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="2dp"
+            android:layout_height="wrap_content">
+            <include layout="@layout/task_details"/>
+        </android.support.v7.widget.CardView>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_height="0dp">
+            <com.mapbox.mapboxsdk.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                mapbox:mapbox_cameraZoom="14"
+                mapbox:mapbox_cameraZoomMax="16"
+                mapbox:mapbox_cameraZoomMin="9" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+                    <!--<Button
+                    android:id="@+id/bt_captureImage"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:background="@color/blue"
+                    android:text="@string/capture_image"
+                    android:textColor="@color/white_color"
+                    android:textSize="12dp" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="Resource"
+                    android:id="@+id/bt_resourcedetails"
+                    android:background="@color/blue"
+                    android:textSize="12dp"
+                    android:layout_marginRight="2dp"
+                    android:textColor="@color/white_color"
+                    android:layout_height="36dp" />
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="boq"
+                    android:id="@+id/bt_boq"
+                    android:background="@color/blue"
+                    android:textSize="12dp"
+                    android:layout_marginRight="2dp"
+                    android:textColor="@color/white_color"
+                    android:layout_height="36dp" />
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="36dp"
+                    android:id="@+id/bt_submit"
+                    android:textSize="12dp"
+                    android:textColor="@color/white_color"
+                    android:background="@color/yellow"
+                    android:text="@string/submit"/>-->
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/bt_captureImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_margin="5dp"
+                        android:src="@mipmap/cam_fab"
+                        mapbox:backgroundTint="@color/yellow" />
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="bottom|right">
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            mapbox:backgroundTint="@color/chartblue" />
+
+                        <TextView
+                            android:id="@+id/bt_distance_height"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:elevation="16dp"
+                            android:fontFamily="@font/lato"
+                            android:text="D / H"
+                            android:textColor="@color/white_color"
+                            android:textSize="12sp" />
+                    </FrameLayout>
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/bt_resourcedetails"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_margin="5dp"
+                        android:src="@drawable/file_document"
+                        mapbox:backgroundTint="@color/blue" />
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|right">
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            mapbox:backgroundTint="@color/boq" />
+
+                        <TextView
+                            android:id="@+id/bt_boq"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:elevation="16dp"
+                            android:fontFamily="@font/lato"
+                            android:text="BOQ"
+                            android:textColor="@color/white_color"
+                            android:textSize="12sp" />
+                    </FrameLayout>
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/bt_prevoiuslocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_margin="5dp"
+                        android:src="@mipmap/map_fab"
+                        mapbox:backgroundTint="@color/liteblue" />
+                    <!--<TextView
+                    android:layout_width="wrap_content"
+                    android:text="BOQ"
+                    android:id="@+id/bt_boq"
+                    android:gravity="center"
+                    android:layout_gravity="end"
+                    android:layout_marginRight="5dp"
+                    android:textColor="@color/white_color"
+                    android:background="@drawable/round_boq"
+                    android:layout_height="wrap_content" />-->
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|right">
+
+                         <android.support.design.widget.FloatingActionButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            mapbox:backgroundTint="@color/green" />
+
+                        <TextView
+                            android:id="@+id/bt_submit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:elevation="16dp"
+                            android:fontFamily="@font/lato"
+                            android:text="Submit"
+                            android:textColor="@color/white_color"
+                            android:textSize="12sp" />
+                    </FrameLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="4dp"
+                        tools:context=".Dashboard.ProjectMonitorActivity">
+
+                        <TextView
+                            android:id="@+id/floor_name_tv"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:fontFamily="@font/lato"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:textColor="@android:color/black"
+                            android:textStyle="bold" />
+                    </RelativeLayout>
+                    <!--<TextView
+                    android:layout_width="wrap_content"
+                    android:text="Submit"
+                    android:id="@+id/bt_submit"
+                    android:gravity="center"
+                    android:layout_gravity="end"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/white_color"
+                    android:background="@drawable/round_fab"
+                    android:layout_height="wrap_content" />-->
+                </LinearLayout>
+            </com.mapbox.mapboxsdk.maps.MapView>
+            <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.example.kanthi.projectmonitoring.Dashboard.MapScreen" />-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                android:id="@+id/blueprint"
+                android:layout_height="match_parent" />
+            <com.github.lzyzsd.circleprogress.DonutProgress
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                mapbox:donut_text_size="10sp"
+                mapbox:donut_circle_starting_degree="-90"
+                mapbox:donut_unfinished_stroke_width="7dp"
+                mapbox:donut_finished_stroke_width="7dp"
+                mapbox:donut_finished_color="@color/red"
+                mapbox:donut_text_color="@color/black_color"
+                android:id="@+id/circle_progress"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/image_marker"
+                android:layout_marginBottom="25dp"
+                android:layout_gravity="center"/>
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="1dp"
+            android:layout_height="wrap_content">
+            <include layout="@layout/button_navigation"/>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

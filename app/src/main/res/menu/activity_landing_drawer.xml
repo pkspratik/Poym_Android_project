@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_PushData"
+            android:icon="@drawable/push_data_new"
+            android:checked="false"
+            android:title="@string/push_data" />
+        <item
+            android:id="@+id/nav_DashBoard"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:checked="false"
+            android:title="@string/dashboard" />
+        <item
+            android:id="@+id/nav_Progress_view"
+            android:icon="@drawable/ic_last_page_black_24dp"
+            android:checked="false"
+            android:title="@string/progress_view" />
+        <!--<item
+            android:id="@+id/nav_Distance_Cam"
+            android:icon="@mipmap/ic_launcher_patroling"
+            android:title="Patroling" />-->
+        <item
+            android:id="@+id/nav_survey"
+            android:checked="false"
+            android:icon="@drawable/ic_map_black_24dp"
+            android:title="@string/survey_execution" />
+        <item
+            android:id="@+id/nav_execution"
+            android:checked="false"
+            android:icon="@drawable/ic_queue_play_next_black_24dp"
+            android:title="@string/project_execution" />
+        <item
+            android:id="@+id/nav_qualitycheck"
+            android:checked="false"
+            android:icon="@drawable/ic_check_circle_black_24dp"
+            android:title="@string/qualitycheck" />
+        <item
+            android:id="@+id/nav_projectrisk"
+            android:checked="false"
+            android:icon="@drawable/ic_transfer_within_a_station_black_24dp"
+            android:title="@string/projectrisk" />
+        <item
+            android:id="@+id/nav_changerequest"
+            android:checked="false"
+            android:icon="@drawable/ic_compare_arrows_black_24dp"
+            android:title="@string/changerequest" />
+        <item
+            android:id="@+id/nav_patroling"
+            android:checked="false"
+            android:icon="@drawable/ic_patroling_24dp"
+            android:title="@string/patroling" />
+        <item
+            android:id="@+id/nav_logout"
+            android:checked="false"
+            android:icon="@drawable/ic_power_settings_new_black_24dp"
+            android:title="@string/logout" />
+    </group>
+
+</menu>

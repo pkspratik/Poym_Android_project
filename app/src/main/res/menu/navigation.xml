@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/surveymap"
+        android:title="SurveyMap" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/projectmonitring"
+        android:title="ProjectMonitor" />
+
+    <item
+        android:id="@+id/navigation_notifications"
+        android:icon="@drawable/statusupdate"
+        android:title="StatusUpdate" />
+
+</menu>

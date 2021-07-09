@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/task_details_layout"
+    android:padding="2dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/lato"
+            android:text="PSD"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/startdate"
+            android:fontFamily="@font/lato"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="PED"
+            android:maxLines="1"
+            android:gravity="center"
+            android:fontFamily="@font/lato"
+            android:textSize="13sp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/enddate"
+            android:fontFamily="@font/lato"
+            android:maxLines="1"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="ASD"
+            android:fontFamily="@font/lato"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/actualstartdate"
+            android:gravity="center"
+            android:fontFamily="@font/lato"
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/lato"
+            android:text="LED"
+            android:maxLines="1"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/lato"
+            android:id="@+id/actualenddate"
+            android:maxLines="1"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Tot.Target"
+            android:fontFamily="@font/lato"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textSize="13sp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/tot_target"
+            android:gravity="center"
+            android:fontFamily="@font/lato"
+            android:maxLines="1"
+            android:textSize="13sp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Cur.Target"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:maxLines="1"
+            android:fontFamily="@font/lato"
+            android:textSize="13sp"
+            android:textColor="@color/black_color"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/curr_target"
+            android:gravity="center"
+            android:fontFamily="@font/lato"
+            android:maxLines="1"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:textColor="@color/black_color"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Actual"
+            android:maxLines="1"
+            android:fontFamily="@font/lato"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/act_target"
+            android:fontFamily="@font/lato"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textSize="13sp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Days Left"
+            android:maxLines="1"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:fontFamily="@font/lato"
+            android:textSize="13sp"
+            android:textColor="@color/black_color"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/daysleft"
+            android:fontFamily="@font/lato"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:textSize="13sp"
+            android:textColor="@color/black_color"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

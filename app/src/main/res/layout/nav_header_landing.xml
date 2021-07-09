@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/nav_header_height"
+    android:background="@color/poym"
+    android:gravity="bottom"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/user_icon"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/user_icon"
+        app:civ_border_width="1dp"
+        app:civ_border_color="@color/bottom_purple"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="5dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:textColor="@color/white_color"
+            android:text=""
+            android:fontFamily="@font/lato"
+            android:id="@+id/header_name"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+        <TextView
+            android:id="@+id/header_email"
+            android:layout_width="wrap_content"
+            android:textColor="@color/white_color"
+            android:fontFamily="@font/lato"
+            android:layout_height="wrap_content"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/version"
+            android:layout_width="wrap_content"
+            android:textColor="@color/white_color"
+            android:fontFamily="@font/lato"
+            android:layout_height="wrap_content"
+            android:text="Version : 16_06_2021_V1" />
+    </LinearLayout>
+
+</LinearLayout>

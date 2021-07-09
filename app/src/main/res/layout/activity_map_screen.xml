@@ -1,0 +1,88 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="2dp"
+            android:layout_height="wrap_content">
+            <include layout="@layout/task_details"/>
+        </android.support.v7.widget.CardView>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_height="0dp">
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.example.kanthi.projectmonitoring.Dashboard.MapScreen" />
+            <com.github.lzyzsd.circleprogress.DonutProgress
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                app:donut_text_size="10sp"
+                app:donut_circle_starting_degree="-90"
+                app:donut_unfinished_stroke_width="7dp"
+                app:donut_finished_stroke_width="7dp"
+                app:donut_finished_color="@color/red"
+                app:donut_text_color="@color/black_color"
+                android:id="@+id/piechart"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:gravity="center"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="24dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:text="save"
+                    android:id="@+id/bt_save"
+                    android:gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/green"
+                    android:fontFamily="@font/lato"
+                    android:background="@drawable/roundbutton"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:text="cancel"
+                    android:gravity="center"
+                    android:id="@+id/bt_cancel"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/lato"
+                    android:textColor="@color/red"
+                    android:background="@drawable/roundbutton"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </FrameLayout>
+        <android.support.v7.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="1dp"
+            android:layout_height="wrap_content">
+            <include layout="@layout/button_navigation"/>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>
+
