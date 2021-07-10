@@ -189,6 +189,8 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
     private OfflineManager offlineManager;
     private OfflineRegion offlineRegion;
 
+    int spinnerSelectPosition=0;
+
     AvahanSqliteDbHelper mDbHelper;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -1005,6 +1007,8 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
             @Override
             public void onClick(View view) {
 
+             int sp =  spinnerSelectPosition;
+
                         mEnteredItemDefinitions = new ArrayList<TaskItemLinkView>();
                         for (TaskItemLinkView itemDefinition : mitemdefinition) {
                             if (itemDefinition.getQuantity() != null) {
@@ -1030,39 +1034,48 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                                // qty = qty + (mEnteredItemDefinitions.get(j).getQuantity() * (mEnteredItemDefinitions.get(j).getUnitprice()));
 
                             }
-//                                for(int i=0;i<mEnteredItemDefinitions.size();i++) {
-//                                    TaskItemLinkView definition = mEnteredItemDefinitions.get(i);
 
-                                int boqno = mheaders.size() <= 0 ? 1 : mheaders.size() + 1;
+                            int q=mEnteredItemDefinitions.get(sp).getQuantity();
 
-                                //int boqno=mEnteredItemDefinitions.get(position).getUnitprice();
-                                long masterId = System.currentTimeMillis();
-                                headers = new BOQHeaders();
-                                headers.setId(masterId);
-                                headers.setZoneId(AppPreferences.getZoneId(Survey.this));
-                                headers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
-                                headers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
-                                headers.setBoqNo("BOQ " + boqno);
-                                headers.setBoqDate(AppUtilities.getDateTime());
 
-                                int price = mEnteredItemDefinitions.get(position).getUnitprice();
-                                int qua = mEnteredItemDefinitions.get(position).getQuantity();
-                                int amount=(price *qua);
 
-                                headers.setTotalamount(String.valueOf(amount));
-                                headers.setNetamount(String.valueOf(amount));
+//
+//
+
+                                for(int i=1;i<=2;i++) {
+                                    TaskItemLinkView definition = mEnteredItemDefinitions.get(i);
+
+                                    int boqno = mheaders.size() <= 0 ? 1 : mheaders.size() + 1;
+
+                                    //int boqno=mEnteredItemDefinitions.get(position).getUnitprice();
+                                    long masterId = System.currentTimeMillis();
+                                    headers = new BOQHeaders();
+                                    headers.setId(masterId);
+                                    headers.setZoneId(AppPreferences.getZoneId(Survey.this));
+                                    headers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
+                                    headers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
+                                    headers.setBoqNo("BOQ " + boqno);
+                                    headers.setBoqDate(AppUtilities.getDateTime());
+
+
+                                    int price = mEnteredItemDefinitions.get(i).getUnitprice();
+                                    int qua = mEnteredItemDefinitions.get(i).getQuantity();
+                                    int amount = (price * qua);
+
+                                    headers.setTotalamount(String.valueOf(amount));
+                                    headers.setNetamount(String.valueOf(amount));
 
 //                                headers.setTotalamount(String.valueOf(qty));
 //                                headers.setNetamount(String.valueOf(qty));
 
-                                //headers.setSurveyid(masterId);
-                                headers.setLastModifiedDate(AppUtilities.getDateTime());
-                                headers.setInsertFlag(true);
-                                headers.setSurveyFlag(true);
+                                    //headers.setSurveyid(masterId);
+                                    headers.setLastModifiedDate(AppUtilities.getDateTime());
+                                    headers.setInsertFlag(true);
+                                    headers.setSurveyFlag(true);
 
-
-                                //postBoqHeaders();
-                            /*try {
+                                }
+                                    //postBoqHeaders();
+                           /* try {
                                 RuntimeExceptionDao<BOQHeaders,Integer> boqHeadersdao=mDbHelper.getBoqHeadersRuntimeDao();
                                 boqHeadersdao.create(headers);
                             }catch (Exception e){
@@ -1070,51 +1083,49 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                             }*/
 
 
-                            //mTrailers = new ArrayList<BOQTrailers>();
+                                    //mTrailers = new ArrayList<BOQTrailers>();
 
-                            int pos =0;
+                                    int pos = 0;
 
-                            for(int i=0;i<mEnteredItemDefinitions.size();i++) {
+                                    for (int j = 0; j < mEnteredItemDefinitions.size(); j++) {
 
-                                if(pos < mEnteredItemDefinitions.size())
-                                {
-                                    pos=0;
-                                }
-                                else
-                                    position=i;
+                                        if (pos < mEnteredItemDefinitions.size()) {
+                                            pos = 0;
+                                        } else
+                                            position = j;
 
-                              //  TaskItemLinkView definition = mEnteredItemDefinitions.get(i);
-                            }
-                             TaskItemLinkView definition = mEnteredItemDefinitions.get(pos);
-                           //  ItemDefinition item =mEnteredItemDefinitions.get(pos);
-                               //int  boqn=mTrailers.size()<=0?1:mTrailers.size()+1;
+                                        //  TaskItemLinkView definition = mEnteredItemDefinitions.get(i);
+                                    }
+                                    TaskItemLinkView definition = mEnteredItemDefinitions.get(pos);
+                                    //  ItemDefinition item =mEnteredItemDefinitions.get(pos);
+                                    //int  boqn=mTrailers.size()<=0?1:mTrailers.size()+1;
 
-                                trailers = new BOQTrailers();
-                                trailers.setInsertFlag(true);
-                                trailers.setId(System.currentTimeMillis());
-                                trailers.setZoneId(AppPreferences.getZoneId(Survey.this));
-                                trailers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
-                                trailers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
-                                trailers.setBoqNo("BOQ" + boqno);
-                                trailers.setBoqDate(AppUtilities.getDateTime());
-                                trailers.setQuantity(String.valueOf(mEnteredItemDefinitions.get(pos).getQuantity()));
-                                trailers.setPrice(String.valueOf(mEnteredItemDefinitions.get(pos).getUnitprice()));
-                                int price1 = definition.getUnitprice();
-                                int quan = definition.getQuantity();
-                                trailers.setAmount(String.valueOf(quan * price1));
+                                    trailers = new BOQTrailers();
+                                    trailers.setInsertFlag(true);
+                                    trailers.setId(System.currentTimeMillis());
+                                    trailers.setZoneId(AppPreferences.getZoneId(Survey.this));
+                                    trailers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
+                                    trailers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
+                           //         trailers.setBoqNo("BOQ" + boqno);
+                                    trailers.setBoqDate(AppUtilities.getDateTime());
+                                    trailers.setQuantity(String.valueOf(mEnteredItemDefinitions.get(sp).getQuantity()));
+                                    trailers.setPrice(String.valueOf(mEnteredItemDefinitions.get(sp).getUnitprice()));
+                                    int price1 = definition.getUnitprice();
+                                    int quan = definition.getQuantity();
+                                    trailers.setAmount(String.valueOf(quan * price1));
 
-                             //   trailers.setAmount(String.valueOf(definition.getQuantity()));
-                               // trailers.setPrice(AdditemRV_Adapter.edtqty);
+                                    //   trailers.setAmount(String.valueOf(definition.getQuantity()));
+                                    // trailers.setPrice(AdditemRV_Adapter.edtqty);
 
-                               // trailers.setItemdefinitionId(definition.getId());
+                                    // trailers.setItemdefinitionId(definition.getId());
 
-                                int itemdef = mEnteredItemDefinitions.get(pos).getItemid();
+                                    int itemdef = mEnteredItemDefinitions.get(sp).getItemid();
 
-                                trailers.setItemdefinitionId(itemdef);
+                                    trailers.setItemdefinitionId(itemdef);
 
-                                trailers.setSurveyid(masterId);
-                                trailers.setBoqheaderId(masterId);
-                                trailers.setSurveyFlag(true);
+                          //          trailers.setSurveyid(masterId);
+                           //         trailers.setBoqheaderId(masterId);
+                                    trailers.setSurveyFlag(true);
 
 
 
@@ -1171,12 +1182,14 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
 //            public void onNothingSelected(AdapterView<?> parent) {
 //
 //            }
-//        });
-
+//        })
         item_type_rv.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(position>0){
+
+                    spinnerSelectPosition = position;
+
                     mdistrubutionRoutrViews.get(position-1);
                     ItemTypeCallingAdapter(mdistrubutionRoutrViews.get(position-1).getTourtypeid(),position-1);
                 }
