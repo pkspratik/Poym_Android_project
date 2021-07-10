@@ -1008,6 +1008,17 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
             public void onClick(View view) {
 
              int sp =  spinnerSelectPosition;
+             int spSecond=0;
+             if (sp==1)
+             {
+               spSecond=0;
+             }
+             else if(sp==2){
+                 spSecond=2;
+             }
+             else if(sp==3){
+                 spSecond=12;
+             }
 
                         mEnteredItemDefinitions = new ArrayList<TaskItemLinkView>();
                         for (TaskItemLinkView itemDefinition : mitemdefinition) {
@@ -1041,8 +1052,11 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
 
 //
 //
+                          //  mheaders = new ArrayList<BOQHeaders>();
+                                for(int i=1;i<=spSecond;i++) {
 
-                                for(int i=1;i<=2;i++) {
+
+
                                     TaskItemLinkView definition = mEnteredItemDefinitions.get(i);
 
                                     int boqno = mheaders.size() <= 0 ? 1 : mheaders.size() + 1;
@@ -1058,8 +1072,8 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                                     headers.setBoqDate(AppUtilities.getDateTime());
 
 
-                                    int price = mEnteredItemDefinitions.get(i).getUnitprice();
-                                    int qua = mEnteredItemDefinitions.get(i).getQuantity();
+                                    int price = mEnteredItemDefinitions.get(position).getUnitprice();
+                                    int qua = mEnteredItemDefinitions.get(position).getQuantity();
                                     int amount = (price * qua);
 
                                     headers.setTotalamount(String.valueOf(amount));
@@ -1073,6 +1087,8 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                                     headers.setInsertFlag(true);
                                     headers.setSurveyFlag(true);
 
+                                  //  mheaders.add(headers);
+
                                 }
                                     //postBoqHeaders();
                            /* try {
@@ -1083,7 +1099,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                             }*/
 
 
-                                    //mTrailers = new ArrayList<BOQTrailers>();
+                                   // mTrailers = new ArrayList<BOQTrailers>();
 
                                     int pos = 0;
 
@@ -1106,12 +1122,12 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                                     trailers.setZoneId(AppPreferences.getZoneId(Survey.this));
                                     trailers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
                                     trailers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
-                           //         trailers.setBoqNo("BOQ" + boqno);
+                           //       trailers.setBoqNo("BOQ" + boqno);
                                     trailers.setBoqDate(AppUtilities.getDateTime());
                                     trailers.setQuantity(String.valueOf(mEnteredItemDefinitions.get(sp).getQuantity()));
                                     trailers.setPrice(String.valueOf(mEnteredItemDefinitions.get(sp).getUnitprice()));
-                                    int price1 = definition.getUnitprice();
-                                    int quan = definition.getQuantity();
+                                    int price1 = mEnteredItemDefinitions.get(position).getUnitprice();
+                                    int quan = mEnteredItemDefinitions.get(position).getQuantity();
                                     trailers.setAmount(String.valueOf(quan * price1));
 
                                     //   trailers.setAmount(String.valueOf(definition.getQuantity()));
@@ -1129,7 +1145,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
 
 
 
-                               //   mTrailers.add(trailers);
+                               //  mTrailers.add(trailers);
 
                                 //enable this comment
                               /* try {
