@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/tv_next_det"
+            android:layout_width="88dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="Detail" />
+
+    <TextView
+        android:layout_width="135dp"
+        android:layout_height="44dp"
+        android:id="@+id/tv_next_detail"
+        android:text=""
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:padding="5dp"
+        android:layout_weight="1"
+        />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        >
+
+        <TextView
+            android:layout_width="88dp"
+            android:layout_height="44dp"
+            android:id="@+id/tv_next_prevdetail"
+            android:text="Pre_Detail"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:padding="5dp"
+            android:layout_weight="1"
+            />
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompletePrivous"
+            android:layout_width="wrap_content"
+            android:maxLines="1"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/lato"
+            android:backgroundTint="@color/signi_in_color"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:gravity="center"
+            android:textColor="@color/signi_in_color"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:hint="Enter_PreDetails"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:padding="5dp"
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+
+
+        <TextView
+            android:id="@+id/tv_next_show_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text=""
+            android:textSize="20dp"
+            android:gravity="center"
+            android:textColor="@color/black_color" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:padding="5dp"
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/btn_pending_next_ok"
+            android:layout_width="88dp"
+            android:layout_height="38dp"
+            android:text="Ok"
+            android:textColor="@color/black_color" />
+
+
+
+        <Button
+            android:id="@+id/btn_pending_next_cancel"
+            android:layout_width="88dp"
+            android:layout_height="38dp"
+            android:layout_marginLeft="70dp"
+            android:text="cancel"
+            android:textColor="@color/black_color" />
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
