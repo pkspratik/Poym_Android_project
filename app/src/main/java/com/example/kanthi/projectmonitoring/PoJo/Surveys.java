@@ -1,6 +1,5 @@
 package com.example.kanthi.projectmonitoring.PoJo;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
 
@@ -8,7 +7,7 @@ import com.j256.ormlite.field.DatabaseField;
  * Created by Kanthi on 3/2/2018.
  */
 
-public class Surveys {
+public class  Surveys {
 
     @SerializedName("linkid")
     @DatabaseField(columnName = "linkid")
@@ -129,6 +128,19 @@ public class Surveys {
     @SerializedName("id")
     @DatabaseField(columnName = "id")
     private long id;
+
+
+
+    @SerializedName("detail")
+    @DatabaseField(columnName = "detail")
+    private String detail;
+
+    @SerializedName("prevslno")
+    @DatabaseField(columnName = "prevslno")
+    private Integer prevslno;
+
+
+
 
     public Integer getLinkid() {
         return linkid;
@@ -371,4 +383,22 @@ public class Surveys {
     public void setOrder(Integer order) {
         this.order = order;
     }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String details) {
+        this.detail = details;
+    }
+
+    public Integer getPrevslno() {
+        return prevslno;
+    }
+
+    public void setPrevslno(Integer prevslno) {
+        this.prevslno = prevslno;
+    }
+
+
 }

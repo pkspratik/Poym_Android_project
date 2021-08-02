@@ -126,7 +126,9 @@
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|right">
+                        android:layout_gravity="bottom|right"
+                        android:id="@+id/frameboq"
+                        >
 
                         <android.support.design.widget.FloatingActionButton
                             android:layout_width="wrap_content"
@@ -167,7 +169,8 @@
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|right">
+                        android:layout_gravity="bottom|right"
+                        android:id="@+id/framesubmit">
 
                          <android.support.design.widget.FloatingActionButton
                             android:layout_width="wrap_content"

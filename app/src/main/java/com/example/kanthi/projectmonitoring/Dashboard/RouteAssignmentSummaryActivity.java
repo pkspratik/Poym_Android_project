@@ -34,17 +34,14 @@ import android.widget.Toast;
 
 import com.example.kanthi.projectmonitoring.Adapters.RouteAssignmentSummary_RV_Adapter;
 import com.example.kanthi.projectmonitoring.Database.AvahanSqliteDbHelper;
-import com.example.kanthi.projectmonitoring.Distance_cam.Distance_Camera;
 import com.example.kanthi.projectmonitoring.Graphs.GraphActivity;
 import com.example.kanthi.projectmonitoring.Login.LoginActivity;
 import com.example.kanthi.projectmonitoring.Network.CustomResultReceiver;
 import com.example.kanthi.projectmonitoring.Network.ProjectMonitorNetworkServices;
 import com.example.kanthi.projectmonitoring.Network.RetrofitHelper;
-import com.example.kanthi.projectmonitoring.Network.ToStringConverterFactory;
 import com.example.kanthi.projectmonitoring.Patroling.Patroling_Activity;
 import com.example.kanthi.projectmonitoring.PoJo.ActualDays;
 import com.example.kanthi.projectmonitoring.PoJo.Days;
-import com.example.kanthi.projectmonitoring.PoJo.Partners;
 import com.example.kanthi.projectmonitoring.PoJo.Partnerviews;
 import com.example.kanthi.projectmonitoring.PoJo.RouteAssignmentSummariesViews;
 import com.example.kanthi.projectmonitoring.PoJo.RouteSalesViews;
@@ -89,6 +86,11 @@ public class RouteAssignmentSummaryActivity extends AppCompatActivity
     List<SalesViews> msalesviews;
     List<Partnerviews> mpartners;
     private TextView mheader_name,mheader_email;
+
+    // i am added new line here
+//    Intent inten = getIntent();
+//    Bundle submitpress=inten.getExtras();
+    // i am added new line here
 
     @BindView(R.id.nav_view)
     NavigationView mNavigationView;
@@ -414,6 +416,7 @@ public class RouteAssignmentSummaryActivity extends AppCompatActivity
                     progressDialog.show();
                     intent = new Intent(RouteAssignmentSummaryActivity.this, SyncOutService.class);
                     intent.putExtra("RESULT_RECEIVER", mReceiver);
+                   // intent.putExtra("submitpress",submitpress.getInt("submitPress")); //added new line
                     startService(intent);
                 } else {
                     AppUtilities.errorDialog(RouteAssignmentSummaryActivity.this, getResources().getString(R.string.check_network_for_push_data));

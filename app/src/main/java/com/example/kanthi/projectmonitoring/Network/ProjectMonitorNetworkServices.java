@@ -377,8 +377,12 @@ public interface ProjectMonitorNetworkServices {
     Call<String> getDBSalesViews(@Query("access_token") String accessToken,@Query("filter[where][id]") int partner_id);
     //Call<String> getDBSalesViews(@Query("access_token") String accessToken);
 
+//    @GET(Constants.URL_GET_SURVEYS)
+//    Call<String> getDBSurveys(@Query("access_token") String accessToken,@Query("filter[where][zoneid]") int zoneid);
+
+    //i am added
     @GET(Constants.URL_GET_SURVEYS)
-    Call<String> getDBSurveys(@Query("access_token") String accessToken,@Query("filter[where][zoneid]") int zoneid);
+    Call<String> getDBSurveys(@Query("access_token") String accessToken,@Query("filter[where][distareaid]") int distareaid);
 
     @GET(Constants.URL_GET_SURVEYS)
     Call<String> getDBQASurveys(@Query("access_token") String accessToken);

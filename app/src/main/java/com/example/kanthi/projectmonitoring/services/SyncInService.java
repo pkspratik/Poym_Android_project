@@ -13,7 +13,6 @@ import com.example.kanthi.projectmonitoring.Canvas.Floor;
 import com.example.kanthi.projectmonitoring.Database.AvahanSqliteDbHelper;
 import com.example.kanthi.projectmonitoring.Network.ProjectMonitorNetworkServices;
 import com.example.kanthi.projectmonitoring.Network.RetrofitHelper;
-import com.example.kanthi.projectmonitoring.Network.ToStringConverterFactory;
 import com.example.kanthi.projectmonitoring.PoJo.AssignedItems;
 import com.example.kanthi.projectmonitoring.PoJo.BOQHeaders;
 import com.example.kanthi.projectmonitoring.PoJo.ChangeReqCategories;
@@ -46,11 +45,9 @@ import com.example.kanthi.projectmonitoring.PoJo.Promotions;
 import com.example.kanthi.projectmonitoring.PoJo.Remarks;
 import com.example.kanthi.projectmonitoring.PoJo.ResourceProgress;
 import com.example.kanthi.projectmonitoring.PoJo.RiskTypes;
-import com.example.kanthi.projectmonitoring.PoJo.RouteAssignmentPartnerSummariesViews;
 import com.example.kanthi.projectmonitoring.PoJo.RouteAssignmentSummaries;
 import com.example.kanthi.projectmonitoring.PoJo.RouteAssignmentSummariesViews;
 import com.example.kanthi.projectmonitoring.PoJo.RouteAssignments;
-import com.example.kanthi.projectmonitoring.PoJo.RoutePartnerSalesViews;
 import com.example.kanthi.projectmonitoring.PoJo.RouteSalesViews;
 import com.example.kanthi.projectmonitoring.PoJo.SalesViews;
 import com.example.kanthi.projectmonitoring.PoJo.Sales_Area;
@@ -424,7 +421,12 @@ public class SyncInService extends Service {
 
     private void fetchSurveys(){
         ProjectMonitorNetworkServices service1 = RetrofitHelper.getInstance().getProjectMonitorNetworkService();
-        Call<String> call1 = service1.getDBSurveys(AppPreferences.getUserId(this),mUser.getZoneId());
+        //Call<String> call1 = service1.getDBSurveys(AppPreferences.getUserId(this),mUser.getZoneId());
+
+
+        Call<String> call1 = service1.getDBSurveys(AppPreferences.getUserId(this),mUser.getDistributionAreaId());//i am added this line
+        //Call<String> call3 = service1.getDBSurveys(AppPreferences.getUserId(this),  //i am added this line
+
         call1.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {

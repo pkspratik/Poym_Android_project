@@ -43,6 +43,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -80,6 +81,7 @@ import com.j256.ormlite.stmt.Where;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -143,7 +145,7 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
     private FloatingActionButton image_popup,resource_dts,previouslocation;
     TextView distance_height,boq,submit;
     private Button survey_map, project_mtr, stats_update;
-    private TextView tv_projectmonitor;
+    private TextView tv_projectmonitor,tv_survey_map;
     private ImageView image_marker,blueprint;
     int ponumber_value;
     private List<PoNumbers> mpoNumberses;
@@ -161,6 +163,8 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
     private LinearLayout layout;
     private TextView startdate,enddate,totaltarget,currenttarget,actualtarget,daysleft,act_stdate,act_enddate;
     int partnerid;
+    int presspending;
+    int pressexc;
     String day,finaldate;
     private File file;
     private String imagepath,qa_comment=null;
@@ -253,6 +257,12 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
         //latitude=bundle.getDouble("Latitude");
         //longitude=bundle.getDouble("Longitude");
         partnerid=bundle.getInt("partnerid");
+        presspending=bundle.getInt("pressbutton"); // i am adding here for getting status value
+        pressexc=bundle.getInt("pressbtnexc");
+
+
+
+
         day=bundle.getString("date");
         if(AppPreferences.getGroupId(ProjectMonitorActivity.this)==14||AppPreferences.getGroupId(ProjectMonitorActivity.this)==17||AppPreferences.getGroupId(ProjectMonitorActivity.this)==18){
             getSupportActionBar().setTitle("Execution"+" ( "+day+" )" );
@@ -302,6 +312,9 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
         act_stdate= (TextView) findViewById(R.id.actualstartdate);
         act_enddate= (TextView) findViewById(R.id.actualenddate);
         layout= (LinearLayout) findViewById(R.id.task_details_layout);
+
+
+
         if(AppPreferences.getActualTarget(ProjectMonitorActivity.this)<AppPreferences.getCurrentTarget(ProjectMonitorActivity.this)){
             //layout.setBackgroundColor(getResources().getColor(R.color.red));
             currenttarget.setTextColor(getResources().getColor(R.color.red));
@@ -332,13 +345,40 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
         image_popup= (FloatingActionButton) findViewById(R.id.bt_captureImage);
         submit = (TextView) findViewById(R.id.bt_submit);
         boq= (TextView) findViewById(R.id.bt_boq);
+        FrameLayout frameboq = findViewById(R.id.frameboq);
+        FrameLayout framesubmit = findViewById(R.id.framesubmit);
         distance_height=findViewById(R.id.bt_distance_height);
         resource_dts = (FloatingActionButton) findViewById(R.id.bt_resourcedetails);
         previouslocation = (FloatingActionButton) findViewById(R.id.bt_prevoiuslocation);
         survey_map = (Button) findViewById(R.id.surveymap);
         project_mtr = (Button) findViewById(R.id.project_monitor);
         tv_projectmonitor= (TextView) findViewById(R.id.tv_projectmonitor);
+        tv_survey_map=(TextView) findViewById(R.id.tv_pendingtask);
         stats_update = (Button) findViewById(R.id.statusupdate);
+
+        if(presspending>0){
+            // i am added here for set hide component
+
+//            survey_map.setBackgroundResource(R.drawable.poym_pending_purple);
+//            tv_survey_map.setTextColor(getResources().getColor(R.color.bottom_purple));
+//            image_popup.setVisibility(View.GONE);
+//            resource_dts.setVisibility(View.GONE);
+//            frameboq.setVisibility(View.GONE);
+//            framesubmit.setVisibility(View.GONE);
+//            previouslocation.setVisibility(View.GONE);
+        }
+        else if(pressexc>0)
+        {
+//            tv_projectmonitor.setTextColor(getResources().getColor(R.color.bottom_purple));
+//            project_mtr.setBackgroundResource(R.drawable.poym_execution_purple);
+        }
+        else {
+
+//            tv_projectmonitor.setTextColor(getResources().getColor(R.color.bottom_purple));
+//            project_mtr.setBackgroundResource(R.drawable.poym_execution_purple);
+
+        }
+
         /*TODO unmask for map */
         if(AppPreferences.getGroupId(ProjectMonitorActivity.this)==23||AppPreferences.getGroupId(ProjectMonitorActivity.this)==41||AppPreferences.getGroupId(ProjectMonitorActivity.this)==39){
             project_mtr.setBackgroundResource(R.drawable.poym_tick_purple);
@@ -348,12 +388,12 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
             }
         }
         else if(AppPreferences.getGroupId(ProjectMonitorActivity.this)==14||AppPreferences.getGroupId(ProjectMonitorActivity.this)==17||AppPreferences.getGroupId(ProjectMonitorActivity.this)==18){
-            project_mtr.setBackgroundResource(R.drawable.poym_execution_purple);
+            project_mtr.setBackgroundResource(R.drawable.poym_execution_purple); // hide this line also
             if(AppPreferences.getProjectType(ProjectMonitorActivity.this).equalsIgnoreCase("dynamic")){
                 image_marker.setBackgroundResource(R.drawable.execution);
             }
         }
-        tv_projectmonitor.setTextColor(getResources().getColor(R.color.bottom_purple));
+        tv_projectmonitor.setTextColor(getResources().getColor(R.color.bottom_purple)); // i am comment this line
 
         //todo unmask for offline download check
         /*if(!isNetworkAvailable() && !AppPreferences.getofflineSuccess(ProjectMonitorActivity.this)){
@@ -680,12 +720,74 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
         survey_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent2 = new Intent(ProjectMonitorActivity.this, MapScreen.class);
+//                survey_map.setBackgroundResource(R.drawable.poym_pending_purple);
+//                tv_survey_map.setTextColor(getResources().getColor(R.color.bottom_purple));
+//
+//                image_popup.setVisibility(View.GONE);
+//                resource_dts.setVisibility(View.GONE);
+//                frameboq.setVisibility(View.GONE);
+//                framesubmit.setVisibility(View.GONE);
+//                previouslocation.setVisibility(View.GONE);
+//
+//                mMapView.getMapAsync(ProjectMonitorActivity.this);
+
+
+               Intent intent2 = new Intent(ProjectMonitorActivity.this, MapScreen.class);
                 intent2.putExtra("partnerid",partnerid);
                 intent2.putExtra("date",day);
+
+                // i am adding lat and long
+                intent2.putExtra("Latitude",lati);
+                intent2.putExtra("Longitude",longi);
+
+
                 startActivity(intent2);
+
+
+               /* if(AppPreferences.getGroupId(ProjectMonitorActivity.this)==23||AppPreferences.getGroupId(ProjectMonitorActivity.this)==41||AppPreferences.getGroupId(ProjectMonitorActivity.this)==39){
+                    project_mtr.setBackgroundResource(R.drawable.poym_tick_purple);
+                    tv_projectmonitor.setText("Approval");
+                    if(AppPreferences.getProjectType(ProjectMonitorActivity.this).equalsIgnoreCase("dynamic")){
+                        //image_marker.setBackgroundResource(R.drawable.approved);
+                    }
+                }
+                else if(AppPreferences.getGroupId(ProjectMonitorActivity.this)==14||AppPreferences.getGroupId(ProjectMonitorActivity.this)==17||AppPreferences.getGroupId(ProjectMonitorActivity.this)==18){
+                    project_mtr.setBackgroundResource(R.drawable.poym_execution_purple);
+                    if(AppPreferences.getProjectType(ProjectMonitorActivity.this).equalsIgnoreCase("dynamic")){
+                        image_marker.setBackgroundResource(R.drawable.execution);
+                    }
+                }*/
+
+                //
+
+
+              //  Toast.makeText(ProjectMonitorActivity.this, "Pending task", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // i am adding onclick listiner here
+
+        project_mtr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                //tv_projectmonitor.setTextColor(getResources().getColor(R.color.bottom_purple));
+//                tv_projectmonitor.setTextColor(getResources().getColor(R.color.bottom_purple));
+//                project_mtr.setBackgroundResource(R.drawable.poym_execution_purple);
+
+                image_popup.setVisibility(View.VISIBLE);
+                resource_dts.setVisibility(View.VISIBLE);
+                frameboq.setVisibility(View.VISIBLE);
+                framesubmit.setVisibility(View.VISIBLE);
+                previouslocation.setVisibility(View.VISIBLE);
+
+                mMapView.getMapAsync(ProjectMonitorActivity.this);
+
+            }
+        });
+
+
         stats_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -853,6 +955,7 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
                                 double sur_lat_to = msurvey.get(i).getToLatitude();
                                 double sur_long_to = msurvey.get(i).getToLongitude();
                                 LatLng sur_map_to = new LatLng(sur_lat_to, sur_long_to);
+
                                 BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_black);
                                 //mMap.addMarker(new MarkerOptions().position(sur_map).icon(icon));
                                 //mMap.addMarker(new MarkerOptions().position(sur_map_to).icon(icon));
@@ -1148,6 +1251,22 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
             return true;
         }
     }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+
+    }
+
     @Override
     public void polygonPaths(ArrayList<Path> path, HashMap<Path, Integer> mPathsMap) {
         this.mPathsList.clear();
@@ -1384,7 +1503,7 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
                                     com.mapbox.mapboxsdk.geometry.LatLng latLng=new com.mapbox.mapboxsdk.geometry.LatLng(sur_map.latitude,sur_map.longitude);
                                     IconFactory iconFactory=IconFactory.getInstance(ProjectMonitorActivity.this);
                                     Icon icon1=iconFactory.fromResource(R.drawable.marker_black);
-                                    mMapbox.addMarker(new MarkerOptions().position(latLng).setIcon(icon1));
+                                    mMapbox.addMarker(new MarkerOptions().position(latLng).setIcon(icon1).setTitle("hii"));
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }
@@ -1498,7 +1617,7 @@ public class ProjectMonitorActivity extends AppCompatActivity implements OnMapRe
                                     IconFactory iconFactory=IconFactory.getInstance(ProjectMonitorActivity.this);
                                     if(mpromotions.get(j).getRouteassignmentsummaryid()==AppPreferences.getRouteAssignmentSummaryId(ProjectMonitorActivity.this)){
                                         Icon icon1=iconFactory.fromResource(R.drawable.blue_marker);
-                                        mMapbox.addMarker(new MarkerOptions().title(String.valueOf(latLng)).position(latLng).setIcon(icon1));
+                                        mMapbox.addMarker(new MarkerOptions().title(/*String.valueOf(latLng)*/"new_point").position(latLng).setIcon(icon1));
                                     }else if(mpromotions.get(j).getRouteassignmentsummaryid()==AppPreferences.getDependentRouteAssignmentSummaryId(ProjectMonitorActivity.this)){
                                         Icon icon1=iconFactory.fromResource(R.drawable.green_marker);
                                         mMapbox.addMarker(new MarkerOptions().title(String.valueOf(latLng)).position(latLng).setIcon(icon1));

@@ -22,12 +22,15 @@ repositories {
 
 android {
     compileSdkVersion 27
+   // compileSdkVersion 28   // added new
     buildToolsVersion "28.0.3"
+    //buildToolsVersion "29.0.0"//added
     defaultConfig {
         applicationId "com.example.kanthi.projectmonitoring"
         minSdkVersion 16
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 27
+      //  targetSdkVersion 28//added
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -43,6 +46,11 @@ android {
 }
 
 dependencies {
+
+
+
+    //implementation 'com.google.android.material:material:1.5.0-alpha01'
+    //compile 'com.google.android.material:material:1.2.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

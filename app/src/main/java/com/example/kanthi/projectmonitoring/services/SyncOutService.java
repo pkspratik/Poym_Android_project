@@ -84,6 +84,7 @@ public class SyncOutService extends Service {
     File uploadFile2;
     String mStr_SyncOutTime;
 
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -140,7 +141,7 @@ public class SyncOutService extends Service {
             if(mSelectedUser.getGroupId()==42){
                 insertPatrols();
             }else{
-                insertRouteAssignments();
+                insertRouteAssignments(); // i am uncomment this calling statement
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -157,12 +158,21 @@ public class SyncOutService extends Service {
         return START_STICKY;
     }
 
+
+
     private void insertRouteAssignments() {
         try {
             final RuntimeExceptionDao<RouteAssignments, Integer> routeAssignmentsDao = mDbHelper.getRouteAssignmentsRuntimeDao();
-            final RouteAssignments routeAssignments = routeAssignmentsDao.queryBuilder().where().eq("is_inserted", true).or().
+            final RouteAssignments routeAssignments = routeAssignmentsDao.queryBuilder().where().//eq("is_inserted", true /*"submitflag","true"*/).or().
                     eq("is_updated", true).queryForFirst();
-            if (routeAssignments != null) {
+
+            /*final RouteAssignments routeAssignments = routeAssignmentsDao.queryBuilder().where().eq("submitflag","true")
+                    .queryForFirst();*/
+
+
+            if (routeAssignments != null) { // i am hide this line
+
+               // if (routeAssignments.getSubmitflag().equals("true") ) { // i am change here add getSubmitFlage
                 ProjectMonitorNetworkServices service = RetrofitHelper.getInstance().
                         getProjectMonitorNetworkService();
 
@@ -197,7 +207,8 @@ public class SyncOutService extends Service {
                             updateBuilder.where().eq("id", routeAssignments.getId());
                             //updateBuilder.updateColumnValue("sync_in_time", null);
                             updateBuilder.updateColumnValue("is_inserted", false);
-                            updateBuilder.updateColumnValue("is_updated", false);
+                            updateBuilder.updateColumnValue("is_updated", false); // i amchanging here fals to true
+                           // updateBuilder.updateColumnValue("is_updated", true); // i am added new line here
                             updateBuilder.update();
 
                             if(mSelectedUser.getGroupId()==29){
@@ -1024,6 +1035,21 @@ public class SyncOutService extends Service {
     private void insertSurveys() {
         try {
             final RuntimeExceptionDao<Surveys, Integer> surveysDao = mDbHelper.getSurveysRuntimeDao();
+
+
+           /* QueryBuilder<Surveys, Integer> queryBuilder = surveysDao.queryBuilder();
+            Where<Surveys, Integer> where = queryBuilder.where();
+            where.and(
+                    where.or(
+                            where.eq("insert_flag", true),
+                            where.eq("updateflag", true)),
+                    where.eq("previous_flag",false));
+
+            final Surveys surveys = queryBuilder.queryForFirst();*/
+
+
+
+
             final Surveys surveys = surveysDao.queryBuilder().where().eq("insert_flag", true).or().
                     eq("updateflag", true).queryForFirst();
             if (surveys != null) {

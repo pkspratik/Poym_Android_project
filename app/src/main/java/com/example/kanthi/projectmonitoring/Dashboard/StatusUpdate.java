@@ -1,13 +1,11 @@
 package com.example.kanthi.projectmonitoring.Dashboard;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,7 +15,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -44,28 +41,20 @@ import android.widget.Toast;
 
 import com.example.kanthi.projectmonitoring.Adapters.Checklist_Sp_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.Details_Rv_Adapter;
-import com.example.kanthi.projectmonitoring.Adapters.Details_Sp_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.Importance_Sp_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.IssueTypes_Sp_Adapter;
-import com.example.kanthi.projectmonitoring.Adapters.QAAssignedItem_Rv_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.Remarks_Sp_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.Review_Sp_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.Status_Sp_Adapter;
 import com.example.kanthi.projectmonitoring.Database.AvahanSqliteDbHelper;
 import com.example.kanthi.projectmonitoring.Network.ProjectMonitorNetworkServices;
 import com.example.kanthi.projectmonitoring.Network.RetrofitHelper;
-import com.example.kanthi.projectmonitoring.Network.ToStringConverterFactory;
-import com.example.kanthi.projectmonitoring.PoJo.AssignedItems;
 import com.example.kanthi.projectmonitoring.PoJo.Checklist;
 import com.example.kanthi.projectmonitoring.PoJo.ChecklistAnswers;
-import com.example.kanthi.projectmonitoring.PoJo.Inventories;
 import com.example.kanthi.projectmonitoring.PoJo.IssueList;
 import com.example.kanthi.projectmonitoring.PoJo.IssueTypes;
-import com.example.kanthi.projectmonitoring.PoJo.ItemDefinition;
-import com.example.kanthi.projectmonitoring.PoJo.ParamCategories;
 import com.example.kanthi.projectmonitoring.PoJo.ParamDetails;
 import com.example.kanthi.projectmonitoring.PoJo.Priority;
-import com.example.kanthi.projectmonitoring.PoJo.ProjectResources;
 import com.example.kanthi.projectmonitoring.PoJo.ProjectStatuses;
 import com.example.kanthi.projectmonitoring.PoJo.Remarks;
 import com.example.kanthi.projectmonitoring.PoJo.RouteAssignmentSummaries;
@@ -73,12 +62,9 @@ import com.example.kanthi.projectmonitoring.PoJo.RouteAssignmentSummariesViews;
 import com.example.kanthi.projectmonitoring.PoJo.RouteAssignments;
 import com.example.kanthi.projectmonitoring.PoJo.RouteSalesViews;
 import com.example.kanthi.projectmonitoring.PoJo.Status;
-import com.example.kanthi.projectmonitoring.PoJo.Surveys;
-import com.example.kanthi.projectmonitoring.PoJo.WareHouses;
 import com.example.kanthi.projectmonitoring.R;
 import com.example.kanthi.projectmonitoring.Utils.AppPreferences;
 import com.example.kanthi.projectmonitoring.Utils.AppUtilities;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -109,7 +95,7 @@ public class StatusUpdate extends AppCompatActivity {
     private Button status_up_submit;
     private CardView bt_nav;
     private Button survey_map,project_mtr,stats_update;
-    private TextView tv_statusupdate,tv_projectMonitor;
+    private TextView tv_statusupdate,tv_projectMonitor,tv_surve_map;
     private TextView field_mgr,field_code,field_location,field_desig;
     private TextView startdate,enddate,totaltarget,currenttarget,actualtarget,daysleft,act_stdate,act_enddate;
     List<Status> mstatuses;
@@ -151,6 +137,8 @@ public class StatusUpdate extends AppCompatActivity {
     private double longi=0.0;
     private LocationManager manager;
     private LocationListener listener;
+
+    private int pressSubmit=0;  // i am added here string
 
     AvahanSqliteDbHelper mDbHelper;
     @Override
@@ -205,6 +193,10 @@ public class StatusUpdate extends AppCompatActivity {
         act_stdate= (TextView) findViewById(R.id.actualstartdate);
         act_enddate= (TextView) findViewById(R.id.actualenddate);
         layout= (LinearLayout) findViewById(R.id.task_details_layout);
+
+
+
+
         if(AppPreferences.getActualTarget(StatusUpdate.this)<AppPreferences.getCurrentTarget(StatusUpdate.this)){
             //layout.setBackgroundColor(getResources().getColor(R.color.red));
             currenttarget.setTextColor(getResources().getColor(R.color.red));
@@ -237,6 +229,7 @@ public class StatusUpdate extends AppCompatActivity {
         per_layout= (LinearLayout) findViewById(R.id.per_layout);
         sp_layout= (LinearLayout) findViewById(R.id.spinner_layout);
         tv_statusupdate= (TextView) findViewById(R.id.tv_statusupdate);
+        tv_surve_map=(TextView)findViewById(R.id.tv_pendingtask); // i am adding tvhere
         task_name.setText(AppPreferences.getTaskName(StatusUpdate.this)+"-"+AppPreferences.getFieldDesignition(StatusUpdate.this));
         task_type.setText(AppPreferences.getTaskType(StatusUpdate.this)+"-"+AppPreferences.getFieldDesignition(StatusUpdate.this));
         unitmeasurementname1.setText("- "+AppPreferences.getUnitMeasurementName(StatusUpdate.this));
@@ -479,8 +472,23 @@ public class StatusUpdate extends AppCompatActivity {
         status_up_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if(AppPreferences.getGroupId(StatusUpdate.this)==14||AppPreferences.getGroupId(StatusUpdate.this)==29||AppPreferences.getGroupId(StatusUpdate.this)==17||AppPreferences.getGroupId(StatusUpdate.this)==18) {
                     if (status_name != null && remark_name != null) {
+
+                        // i am added here new line
+
+                      /*  pressSubmit=pressSubmit+1;
+
+                        Intent actualstatus = new Intent(StatusUpdate.this, RouteAssignmentSummaryActivity.class);
+                        actualstatus.putExtra("submitPress",pressSubmit);
+                        startActivity(actualstatus);*/
+
+
+
+                        // i am added here new line
+
+
                         long masterId = System.currentTimeMillis();
                         projectStatuses = new ProjectStatuses();
                         projectStatuses.setId(masterId);
@@ -514,7 +522,7 @@ public class StatusUpdate extends AppCompatActivity {
                         projectStatuses.setZoneId(AppPreferences.getZoneId(StatusUpdate.this));
                         projectStatuses.setDistributionAreaId(AppPreferences.getDist_Area_Id(StatusUpdate.this));
                         projectStatuses.setSalesAreaId(AppPreferences.getPrefAreaId(StatusUpdate.this));
-                        //postProjectStatus();
+                        //postProjectStatus();    // i am visual this colling method
                         /*String fromdate=AppPreferences.getFromDateValue(StatusUpdate.this);
                         String updateview_date=null;
                         if(fromdate!=null){
@@ -664,6 +672,10 @@ public class StatusUpdate extends AppCompatActivity {
                             UpdateBuilder<RouteAssignments,Integer> updateBuilder1=routeAssignmentsDao.updateBuilder();
                             updateBuilder1.updateColumnValue("id",AppPreferences.getRouteAssignmentId(StatusUpdate.this));
                             updateBuilder1.updateColumnValue("routeassignmentsummaryid",AppPreferences.getRouteAssignmentSummaryId(StatusUpdate.this));
+
+                            //i am added this new line for displaying subtaskid
+                          //  updateBuilder1.updateColumnValue("subtaskid",AppPreferences.getSubTypeId(StatusUpdate.this));
+
                             updateBuilder1.updateColumnValue("totalactual",qa_actual);
                             updateBuilder1.updateColumnValue("qasubmitflag",true);
                             updateBuilder1.updateColumnValue("is_updated",true);
@@ -724,10 +736,23 @@ public class StatusUpdate extends AppCompatActivity {
         survey_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent1=new Intent(StatusUpdate.this,MapScreen.class);
+               /* survey_map.setBackgroundResource(R.drawable.poym_pending_purple);
+                tv_surve_map.setTextColor(getResources().getColor(R.color.bottom_purple));
+
+                Toast.makeText(StatusUpdate.this, "Pending Task", Toast.LENGTH_SHORT).show();*/
+               Intent intent1=new Intent(StatusUpdate.this,MapScreen.class);
+
                 intent1.putExtra("partnerid",partnerid);
                 intent1.putExtra("date",day);
                 startActivity(intent1);
+
+              /*  Intent intent2=new Intent(StatusUpdate.this,ProjectMonitorActivity.class);
+                //intent2.putExtra("Latitude",latitude);
+                //intent2.putExtra("Longitude",longitude);
+                intent2.putExtra("partnerid",partnerid);
+                intent2.putExtra("date",day);
+                intent2.putExtra("pressbutton",1);    // i am added code here
+                startActivity(intent2);*/
             }
         });
         /*stats_update.setOnClickListener(new View.OnClickListener() {
@@ -739,10 +764,18 @@ public class StatusUpdate extends AppCompatActivity {
         project_mtr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // i am adding here set color
+               // tv_projectmonitor.setTextColor(getResources().getColor(R.color.bottom_purple));
+                project_mtr.setBackgroundResource(R.drawable.poym_execution_purple);
+                // i am adding here set color
+
+
                 Intent intent2=new Intent(StatusUpdate.this,ProjectMonitorActivity.class);
                 //intent2.putExtra("Latitude",latitude);
                 //intent2.putExtra("Longitude",longitude);
                 intent2.putExtra("partnerid",partnerid);
+                intent2.putExtra("pressbtnexc",1);
                 intent2.putExtra("date",day);
                 startActivity(intent2);
             }
@@ -1138,6 +1171,11 @@ public class StatusUpdate extends AppCompatActivity {
                                     RuntimeExceptionDao<ChecklistAnswers, Integer> checklistAnswersDao = mDbHelper.getChecklistAnswersRuntimeDao();
                                     checklistAnswersDao.create(checklistAnswers);
                                     Log.d("ChecklistAnswers","post");
+
+
+                                    // i am added this line
+
+
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }

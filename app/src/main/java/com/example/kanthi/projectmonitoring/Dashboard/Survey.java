@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -34,7 +35,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,6 +45,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -57,6 +61,8 @@ import com.example.kanthi.projectmonitoring.Adapters.Details_Rv_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.Details_Sp_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.DistributioRouteView_Sp_Adapter;
 import com.example.kanthi.projectmonitoring.Adapters.ItemType_Sp_Adapter;
+import com.example.kanthi.projectmonitoring.Adapters.Loc_Auto_Detail;
+import com.example.kanthi.projectmonitoring.Adapters.Location_Sp_PrevSlno_Adapter;
 import com.example.kanthi.projectmonitoring.Database.AvahanSqliteDbHelper;
 import com.example.kanthi.projectmonitoring.PoJo.BOQHeaders;
 import com.example.kanthi.projectmonitoring.PoJo.BOQTrailers;
@@ -72,7 +78,11 @@ import com.example.kanthi.projectmonitoring.PoJo.TaskItemLinkView;
 import com.example.kanthi.projectmonitoring.R;
 import com.example.kanthi.projectmonitoring.Utils.AppPreferences;
 import com.example.kanthi.projectmonitoring.Utils.AppUtilities;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -100,6 +110,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -109,12 +120,18 @@ import java.util.Date;
 import java.util.List;
 
 public class Survey extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnCameraIdleListener {
+
+    //i am adding this line
+    FusedLocationProviderClient client;
+
+
     //private GoogleMap mMap;
     private MapboxMap mMapbox;
     private MapView mMapView;
 
-    private FloatingActionButton sur_save,sur_order;
-    private FloatingActionButton sur_location,sur_details;
+    private FloatingActionButton sur_save, sur_order;
+    private FloatingActionButton sur_location, sur_details;
+    private FloatingActionButton sur_current_location,sur_zoom_in,sur_zoom_out;
     private LocationManager manager;
     private LocationListener listener;
     private double lati;
@@ -125,29 +142,40 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
     private TextView drag_marker;
     private List<ParamCategories> mparamCategories;
     private int paramid;
-    private String param_name,param_type,dropdown_value,rb_values;
+    private String param_name, param_type, dropdown_value, rb_values;
     private ArrayList<ParamDetails> mdetails;
-    int item_sub_type_id, mIntCategoryPriority = 0,mIntItemPriority=0,mIntItemSubPriority=0;
+    int item_sub_type_id, mIntCategoryPriority = 0, mIntItemPriority = 0, mIntItemSubPriority = 0;
     private ParamDetails details;
     private Surveys surveys;
+    // i am added new line here for getting routeassigment
+//    private RouteAssignments routeAssignments;
+//    private List<RouteAssignments> routeAssignmentsList;
     private SurveyPromotions surveyPromotions;
-    private int count=0;
+    private int count = 0;
     String cal;
     private CoordinatorLayout coordinatorLayout;
     private List<Surveys> msurvey;
     private List<Surveys> mfiltersurvey;
+    private String sureditloc = "";
+    private int previous_Sl_no = 0;
+    private int fixp = 0;
+    private int countNo =0;
+    private int countZoom=0;
+    private int testcountzoom=0;
+    private int pre_Sl_no = 0;
     ArrayList<LatLng> points;
     ProgressDialog progressDialog2;
     private BOQHeaders headers;
     private BOQTrailers trailers;
     private List<BOQHeaders> mheaders;
+    private  long masterId = /*0;*/  System.currentTimeMillis(); //  i am added master id here
     //
-    private List<BOQTrailers> mTrailers;
-    //private ArrayList<BOQTrailers> mTrailers;
+    //private List<BOQTrailers> mTrailers;      // i am hide this line and visual below line
+    private ArrayList<BOQTrailers> mTrailers;
     private Paint mPaint;
     int partnerid;
     ProgressDialog progressDialog;
-    private Boolean Initial=true;
+    private Boolean Initial = true;
     private AdditemRV_Adapter additemRV_adapter;
     private RecyclerView rvOrderedItems;
     private LinearLayoutManager manager1;
@@ -168,9 +196,9 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
     private String imagepath;
     int surveyid;
     String imagename;
-    int trailerCount=0,detailscount=0;
+    int trailerCount = 0, detailscount = 0;
 
-    public static final int REQUEST_IMAGE_CAPTURE=1;
+    public static final int REQUEST_IMAGE_CAPTURE = 1;
     private Uri picUri;
     private File picFile;
     public String imagePath;
@@ -189,14 +217,18 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
     private OfflineManager offlineManager;
     private OfflineRegion offlineRegion;
 
-    int spinnerSelectPosition=0;
+    int spinnerSelectPosition = 0;
+
 
     AvahanSqliteDbHelper mDbHelper;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
         setContentView(R.layout.activity_survey);
+
+        client = LocationServices.getFusedLocationProviderClient(this); // i am added this line
 
         mMapView = findViewById(R.id.mapView);
         progressBar = findViewById(R.id.progress_bar);
@@ -213,14 +245,17 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         drag_marker = findViewById(R.id.drag_marker);
         sur_location = findViewById(R.id.survey_location);
         sur_details = findViewById(R.id.survey_details);
+        sur_current_location=findViewById(R.id.survey_currentLocation);
+        sur_zoom_in=findViewById(R.id.survey_ZoomIn);
+        sur_zoom_out=findViewById(R.id.survey_ZoomOut);
         sur_save = findViewById(R.id.survey_save);
         sur_order = findViewById(R.id.survey_order);
         Intent in = getIntent();
         Bundle bun = in.getExtras();
         //Toast.makeText(this, ""+bun.getInt("partnerid"), Toast.LENGTH_SHORT).show();
         partnerid = bun.getInt("partnerid");
-        day=bun.getString("date");
-        getSupportActionBar().setTitle("Survey"+" ( "+day+" )");
+        day = bun.getString("date");
+        getSupportActionBar().setTitle("Survey" + " ( " + day + " )");
         Calendar calendar = Calendar.getInstance();
         Date date = calendar.getTime();
         cal = String.valueOf(date);
@@ -228,6 +263,8 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         sur_order.setEnabled(false);
         sur_location.setEnabled(false);
         sur_save.setEnabled(false);
+
+
 
         //userLocation();
 
@@ -237,6 +274,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         progres.setIndeterminate(true);
         progres.setCancelable(false);
         //networksurvey();
+
 
         //todo unmask for offline
         /*if(!isNetworkAvailable() && !AppPreferences.getofflineSuccess(Survey.this)){
@@ -264,11 +302,441 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         mObjDialog.setCancelable(false);
 
         mdetails = new ArrayList<ParamDetails>();
-        msurvey=new ArrayList<>();
-        mfiltersurvey=new ArrayList<>();
+        msurvey = new ArrayList<>();
+        mfiltersurvey = new ArrayList<>();
+
+        mTrailers = new ArrayList<BOQTrailers>();  //i am added this line
+        // mheaders = new ArrayList<BOQHeaders>();   //i am added new header here
+
+
+        // i am added value here from statusupdate
+       /* Intent actualstatus= getIntent();
+        Bundle s =actualstatus.getExtras();
+        String actua= s.toString();*/
+
+
+
+
+        // i am added value here from statusupdate
+
+
+
+        sur_current_location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                countNo=0;
+                countZoom=0;
+
+
+                Toast.makeText(Survey.this, "Current Location", Toast.LENGTH_SHORT).show();
+
+                CameraPosition position = new CameraPosition.Builder()
+                        .target(new com.mapbox.mapboxsdk.geometry.LatLng(lati, longi))
+                        .zoom(15)
+                        .tilt(20)
+                        .build();
+                if (mMapbox != null)
+                    mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1000);
+
+
+
+            }
+        });
+
+        sur_zoom_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                countZoom=0;
+                countNo = countNo+1;
+               // Toast.makeText(Survey.this, "ZoomOut", Toast.LENGTH_SHORT).show();
+               // zoom(0.5f, 0.5f, new PointF(0, 0));
+                if(countNo==1) {
+                   //  Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                    CameraPosition position = new CameraPosition.Builder()
+                            .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                            .zoom(14)
+                            .tilt(20)
+                            .build();
+                    if (mMapbox != null)
+                        mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1500);
+               }
+                else if(countNo==2)
+                {
+                    //Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                    CameraPosition position = new CameraPosition.Builder()
+                            .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                            .zoom(13)
+                            .tilt(20)
+                            .build();
+                    if (mMapbox != null)
+                        mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1400);
+                }
+                 else if(countNo==2)
+                {
+                    //Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                    CameraPosition position = new CameraPosition.Builder()
+                            .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                            .zoom(12)
+                            .tilt(20)
+                            .build();
+                    if (mMapbox != null)
+                        mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1300);
+                }
+                else if(countNo==3)
+                {
+                   // Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                    CameraPosition position = new CameraPosition.Builder()
+                            .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                            .zoom(11)
+                            .tilt(20)
+                            .build();
+                    if (mMapbox != null)
+                        mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1300);
+                }
+                else if(countNo>=4)
+                {
+                  //  Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                    CameraPosition position = new CameraPosition.Builder()
+                            .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                            .zoom(5)
+                            .tilt(20)
+                            .build();
+                    if (mMapbox != null)
+                        mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1000);
+                    testcountzoom=4;
+                }
+            }
+        });
+
+        sur_zoom_in.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                countNo=0;
+                countZoom = countZoom+1;
+
+                if(testcountzoom==4)
+                {
+
+
+                    if(countZoom==1) {
+                        //  Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(8)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1500);
+                    }
+                    else if(countZoom==2)
+                    {
+                        //Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(10)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1400);
+                    }
+                    else if(countZoom==3)
+                    {
+                        //Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(15)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1300);
+
+                    }
+                    else if(countZoom==4)
+                    {
+                        // Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(18)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1300);
+                    }
+                    else if(countZoom>=4)
+                    {
+                        //  Toast.makeText(Survey.this, "ZoomOut"+countNo, Toast.LENGTH_SHORT).show();
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(25)
+                                .tilt(16)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1000);
+
+                        testcountzoom=0;
+                    }
+
+
+
+                }
+
+              else {
+
+                    if (countZoom == 1) {
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(15.5)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 500);
+
+                    } else if (countZoom == 2) {
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(16)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 500);
+
+                    } else if (countZoom == 3) {
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(18)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 500);
+
+                    } else if (countZoom > 3) {
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(latitude, longitude))
+                                .zoom(20)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 500);
+
+                    }
+
+                    //zoom(2f, 2f, new PointF(0, 0));
+                }
+            }
+        });
+
+
         sur_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(Survey.this);
+                View view = LayoutInflater.from(Survey.this).inflate(R.layout.survey_location_previous_details, null);
+                builder1.setCancelable(false);
+                builder1.setTitle("Survey");
+                builder1.setView(view);
+                EditText edt_detail = view.findViewById(R.id.edt_survey_detail);
+                TextView tv_details = view.findViewById(R.id.tv_det);
+                AutoCompleteTextView preslnoauto = view.findViewById(R.id.autoCompletePrivous);
+                //Spinner dropdown = view.findViewById(R.id.dropdown_prev_sl);
+                final Spinner sp_dropdoen = view.findViewById(R.id.dropdown_prev_sl);
+                Button btn_ok = view.findViewById(R.id.btn_survey_ok);
+                Button btn_cancel = view.findViewById(R.id.btn_survey_cancel);
+                // final AlertDialog alertDialog = builder1.create();
+
+                AlertDialog alert = builder1.create();
+
+                String com = preslnoauto.getText().toString();
+
+                if (preslnoauto.getText().toString().trim().length() == 0) {
+                    preslnoauto.setText("");
+                }
+
+                // this is used for after changing  text on edtittext or AutocompleteText
+                preslnoauto.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+//                             Toast.makeText(Survey.this, ""+s.toString().trim().length(), Toast.LENGTH_SHORT).show();
+
+                        if (s.toString().trim().length() == 0) {
+
+                            tv_details.setText("");
+                        }
+
+                    }
+                });
+                preslnoauto.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                        Surveys selectedsurvaysdet = (Surveys) parent.getAdapter().getItem(position);
+                        // Toast.makeText(Survey.this, "hello"+position, Toast.LENGTH_SHORT).show();
+                        // preslnoauto.setText(String.valueOf(selectedsurvaysdet.getSlno()));
+
+                        String setvalue = selectedsurvaysdet.getDetail();
+
+                        preslnoauto.setText(selectedsurvaysdet.getDetail());
+
+                        Integer pos = selectedsurvaysdet.getSlno();
+
+                        // String edtvalue = preslnoauto.getText().toString().trim();
+                        // Integer pos = Integer.parseInt(edtvalue);
+
+                        //int fixpos=(pos+432);
+
+                        fixp = (pos + 0);
+                        int posp = (fixp - 1);
+
+
+                        //if (fixp <= msurvey.size()) {
+                            //if(fixp<=msurvey.size()) {
+                            if (msurvey.get(posp).getDetail() != null) {
+                                tv_details.setText(msurvey.get(posp).getDetail());
+                            } else
+                                tv_details.setText("Details is Empty");
+                       // } else
+                        //    tv_details.setText("Details is Empty");
+
+
+                    }
+                });
+
+
+                try {
+                    RuntimeExceptionDao<Surveys, Integer> surveysdetailDao = mDbHelper.getSurveysRuntimeDao();
+                    msurvey = surveysdetailDao.queryForAll();
+                    preslnoauto.setThreshold(1);
+
+                    Loc_Auto_Detail loc = new Loc_Auto_Detail(Survey.this, msurvey);
+                    preslnoauto.setAdapter(loc);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+
+
+                try {
+                    final Location_Sp_PrevSlno_Adapter locAdabter = new Location_Sp_PrevSlno_Adapter(Survey.this, msurvey);
+                    sp_dropdoen.setAdapter(locAdabter);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                sp_dropdoen.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+
+                        previous_Sl_no = position;
+
+                        // surveys.setDetails(edt_detail.getText().toString());
+
+
+                        if (previous_Sl_no > 0) {
+
+                            if (msurvey.get(previous_Sl_no - 1).getDetail() != null) {
+                                tv_details.setText(msurvey.get(previous_Sl_no - 1).getDetail());
+                            } else {
+                                tv_details.setText("Details is empty");
+                            }
+                        }
+//                                Surveys value = msurvey.get(185);
+//                            //  tv_details.setText("hii");
+//                               tv_details.setText(msurvey.get(185).getDetails());
+//
+                        // tv_details.setText(msurvey.get(previous_Sl_no).getDetails());
+                        Toast.makeText(Survey.this, "" + position, Toast.LENGTH_SHORT).show();
+//
+                           /* surveys = new Surveys();
+                            surveys.setDetails(edt_detail.getText().toString());
+                            try {
+                                Dao<Surveys, Integer> survaysdov = mDbHelper.getSurveysDao();
+                                survaysdov.create(surveys);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }*/
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+
+
+
+
+                /*Integer prev_slno = p_slno.get(sp_dropdoen.getSelectedItemPosition() - 1).getPrevslno();
+                String[] Array = prev_slno.toString().split(",");
+                //Integer [] Array = prev_slno.
+                List<Integer> prev_values = new ArrayList<Integer>();
+                for ( String sno : Array) {
+                    prev_values.add(Integer.valueOf(sno));
+                    // param_values.set(0,"Val");
+                }
+
+                ArrayAdapter<Integer> sprev_adapter;
+                sprev_adapter = new ArrayAdapter<Integer>(Survey.this, android.R.layout.simple_list_item_1,prev_values);
+                sp_dropdoen.setAdapter(sprev_adapter);*/
+
+
+//                      try {
+//                           RuntimeExceptionDao<Surveys,Integer> survayspriv_no=mDbHelper.getSurveysRuntimeDao();
+//                                survayspriv_no.create(surveys);
+//                            }catch (Exception e){
+//                                e.printStackTrace();
+//                            }
+
+
+                btn_ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if (preslnoauto.getText().toString().trim().length() == 0) {
+                            fixp = 0;
+                        }
+
+
+                        if (edt_detail.getText().toString().equals("")) {
+                            Toast.makeText(Survey.this, "Enter Detail", Toast.LENGTH_SHORT).show();
+
+                        } else
+
+                            // Toast.makeText(Survey.this,  edt_detail.getText().toString(), Toast.LENGTH_LONG).show();
+//
+                            sureditloc = edt_detail.getText().toString();
+
+                        alert.dismiss();
+
+
+                    }
+                });
+
+                btn_cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alert.dismiss();
+                    }
+                });
+
+                alert.show();
+                alert.getWindow().setLayout(700, 1300);
+
+
                 if (latitude != 0.0 && longitude != 0.0) {
                     //Toast.makeText(Survey.this, "" + latitude + "," + longitude, Toast.LENGTH_SHORT).show();
                     Toast.makeText(Survey.this, "Location Captured", Toast.LENGTH_SHORT).show();
@@ -282,6 +750,9 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 } else {
                     Toast.makeText(Survey.this, "Drag The Marker", Toast.LENGTH_SHORT).show();
                 }
+
+             /* alert.show();
+                alert.getWindow().setLayout(1000, 2000);*/
             }
         });
         sur_details.setOnClickListener(new View.OnClickListener() {
@@ -328,7 +799,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
 
                         if (ContextCompat.checkSelfPermission(Survey.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(Survey.this,
-                                    new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE},
+                                    new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                                     1);
                         } else {
                             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -342,7 +813,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 try {
                     final Details_Sp_Adapter adapter = new Details_Sp_Adapter(Survey.this, mparamCategories);
                     sp_parameter.setAdapter(adapter);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 sp_parameter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -353,7 +824,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                             param_name = mparamCategories.get(sp_parameter.getSelectedItemPosition() - 1).getName();
                             param_type = mparamCategories.get(sp_parameter.getSelectedItemPosition() - 1).getInputtype();
                             if (param_type.equalsIgnoreCase("numeric")) {
-                                param_value.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED );
+                                param_value.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
                             } else {
                                 param_value.setInputType(InputType.TYPE_CLASS_TEXT);
                             }
@@ -386,7 +857,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                                 List<String> param_values = new ArrayList<String>();
                                 for (String name : Array) {
                                     param_values.add(name);
-                                   // param_values.set(0,"Val");
+                                    // param_values.set(0,"Val");
                                 }
 
                                 ArrayAdapter<String> sp_adapter;
@@ -414,7 +885,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                                 String[] Array = inputvalues.split(",");
 
                                 //add this new
-                               // RadioButton rdbtn = new RadioButton(Survey.this);
+                                // RadioButton rdbtn = new RadioButton(Survey.this);
 
                                 for (int r = 0; r < Array.length; r++) {
 
@@ -440,7 +911,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                                         }*/
 
 
-                                        if (null != rb_yes1 ) {
+                                        if (null != rb_yes1) {
                                             rb_values = rb_yes1.getText().toString();
                                         }
                                     }
@@ -461,13 +932,13 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 para_add.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if((param_type!=null && param_value.length()!=0)
-                                || (param_type!=null && dropdown_value!=null)
-                                || (param_type!=null && rb_values!=null)){
+                        if ((param_type != null && param_value.length() != 0)
+                                || (param_type != null && dropdown_value != null)
+                                || (param_type != null && rb_values != null)) {
                             details = new ParamDetails();
                             long masterId = System.currentTimeMillis();
                             details.setCategoryid(String.valueOf(paramid));
-                            details.setParametervalue(param_name==null?"":param_name);
+                            details.setParametervalue(param_name == null ? "" : param_name);
                             if (param_type.equalsIgnoreCase("text") || param_type.equalsIgnoreCase("numeric")) {
                                 details.setDescription(param_value.getText().toString());
                             }
@@ -491,8 +962,9 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                                     recyclerview_adapter.notifyDataSetChanged();
                                 }
                                 param_value.setText("");
-                                param_type=null;
-                                sp_parameter.setSelection(0);la_spinner.setVisibility(View.GONE);
+                                param_type = null;
+                                sp_parameter.setSelection(0);
+                                la_spinner.setVisibility(View.GONE);
                                 la_radiio.setVisibility(View.GONE);
                                 la_edittext.setVisibility(View.VISIBLE);
                                 la_location.setVisibility(View.GONE);
@@ -506,7 +978,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                             } else {
                                 Toast.makeText(Survey.this, "Empty data", Toast.LENGTH_SHORT).show();
                             }
-                        } else{
+                        } else {
                             Toast.makeText(Survey.this, "Select Parameter/ Enter value", Toast.LENGTH_SHORT).show();
                         }
 
@@ -515,13 +987,13 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 sur_ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(mdetails.size()>0){
+                        if (mdetails.size() > 0) {
                             dailog.dismiss();
                             sur_details.setBackgroundColor(getResources().getColor(R.color.lite_white));
                             drag_marker.setText("Click The Order");
                             sur_order.setBackgroundColor(getResources().getColor(R.color.bottom_purple));
                             sur_order.setEnabled(true);
-                        }else {
+                        } else {
                             Toast.makeText(Survey.this, "Select Parameter", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -538,6 +1010,9 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         sur_order.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //mTrailers = new ArrayList<BOQTrailers>(); // i am adding
+
                 showconfirmpopup();
             }
         });
@@ -552,17 +1027,63 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                     surveys.setLinkid(AppPreferences.getPrefAreaId(Survey.this));
                     surveys.setLatitude(latitude);
                     surveys.setLongitude(longitude);
-                    surveys.setLandmark(geoaddress);
+                    surveys.setLandmark(geoaddress); // create adi
                     surveys.setSlno(msurvey.size() + 1);
+
+
+                    // String s =   msurvey.get(msurvey.size()).getDetails();
+                    surveys.setDetail(sureditloc);
+
+                    //  surveys.setRemark(sureditloc); //added
+
+                    int total = msurvey.size();
+                    int startp = total - 1;
+
+
+                   /* if(previous_Sl_no>0) {
+                        surveys.setPrevslno(previous_Sl_no);// add this line for setting prevslno
+                    }*/
+
+                    if (fixp > 0) {
+                        surveys.setPrevslno(fixp);// add this line for setting prevslno
+                    }
+//                      //  surveys.setDetails(msurvey.get(i).getDetails());
+//                       // String enter_text=
+//                       // surveys.setDetails();
+//                    }
+
+
                     surveys.setUserid(AppPreferences.getEmployeeId(Survey.this));
-                    surveys.setRouteassignmentid(AppPreferences.getRouteAssignmentId(Survey.this));
-                    surveys.setRouteassignmentsummaryid(AppPreferences.getRouteAssignmentSummaryId(Survey.this));
+
+                  // String string = AppPreferences.getSubmitflag().toString();
+                  /* if(string.trim().length()>0)
+                   {
+                       Toast.makeText(Survey.this, ""+string, Toast.LENGTH_SHORT).show();
+                   }
+                   else
+                   {
+                       Toast.makeText(Survey.this, "null", Toast.LENGTH_SHORT).show();
+                   }*/
+
+                    // i am added new line here
+                  /*  if(routeAssignments.getSubmitflag().equals(true))
+                    {
+                         surveys.setRouteassignmentid(AppPreferences.getRouteAssignmentId(Survey.this));
+                          surveys.setRouteassignmentsummaryid(AppPreferences.getRouteAssignmentSummaryId(Survey.this));
+                    }*/
+
+                   // surveys.setRouteassignmentid(AppPreferences.getRouteAssignmentId(Survey.this));
+                  //  surveys.setRouteassignmentsummaryid(AppPreferences.getRouteAssignmentSummaryId(Survey.this));
                     surveys.setZoneid(AppPreferences.getZoneId(Survey.this));
                     surveys.setAreaid(AppPreferences.getPrefAreaId(Survey.this));
                     surveys.setDistareaid(AppPreferences.getDist_Area_Id(Survey.this));
-                    surveys.setDistsubareaid(AppPreferences.getDistributionSubAreaId(Survey.this).equalsIgnoreCase("null")?0:Integer.valueOf(AppPreferences.getDistributionSubAreaId(Survey.this)));
+                    surveys.setDistsubareaid(AppPreferences.getDistributionSubAreaId(Survey.this).equalsIgnoreCase("null") ? 0 : Integer.valueOf(AppPreferences.getDistributionSubAreaId(Survey.this)));
+                    //surveys.setDistsubareaid(AppPreferences.getDist_Area_Id(Survey.this)); // i am added new line
                     surveys.setPendingflag(false);
                     surveys.setInsertFlag(true);
+
+                    //surveys.setUpdateflag(true);  // i am added this new line
+
                     surveys.setDate(AppUtilities.getDateTime());
                     //postSurvey();
                     surveyPromotions = new SurveyPromotions();
@@ -571,7 +1092,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                     surveyPromotions.setRetailername(String.valueOf(AppPreferences.getZoneId(Survey.this)));
                     surveyPromotions.setRetailerid(AppPreferences.getPrefAreaId(Survey.this));
                     surveyPromotions.setRetaileraddress(cal.substring(4, 10));
-                    surveyPromotions.setRetailerimage(AppPreferences.getPrefCaptureImage(Survey.this)==null?"null":AppPreferences.getPrefCaptureImage(Survey.this));
+                    surveyPromotions.setRetailerimage(AppPreferences.getPrefCaptureImage(Survey.this) == null ? "null" : AppPreferences.getPrefCaptureImage(Survey.this));
                     surveyPromotions.setDatetime(AppUtilities.getDateTime1());
                     surveyPromotions.setLatitude(latitude);
                     surveyPromotions.setLongitude(longitude);
@@ -582,39 +1103,57 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                     surveyPromotions.setDistareaid(AppPreferences.getDist_Area_Id(Survey.this));
                     surveyPromotions.setZoneid(AppPreferences.getZoneId(Survey.this));
                     surveyPromotions.setSalesmgrid(AppPreferences.getSaleMngrIdId(Survey.this));
-                    surveyPromotions.setRouteassignmentsummaryid(AppPreferences.getRouteAssignmentSummaryId(Survey.this));
-                    surveyPromotions.setRouteassignmentid(AppPreferences.getRouteAssignmentId(Survey.this));
+                  //  surveyPromotions.setRouteassignmentsummaryid(AppPreferences.getRouteAssignmentSummaryId(Survey.this));
+                  //  surveyPromotions.setRouteassignmentid(AppPreferences.getRouteAssignmentId(Survey.this));
+
+                   /* if(routeAssignments.getSubmitflag().equals(true))
+                    {
+                        surveyPromotions.setRouteassignmentsummaryid(AppPreferences.getRouteAssignmentSummaryId(Survey.this));
+                        surveyPromotions.setRouteassignmentid(AppPreferences.getRouteAssignmentId(Survey.this));
+                    }*/
+
+
                     try {
-                        RuntimeExceptionDao<Surveys,Integer> surveysDao = mDbHelper.getSurveysRuntimeDao();
+                        RuntimeExceptionDao<Surveys, Integer> surveysDao = mDbHelper.getSurveysRuntimeDao();
                         surveysDao.create(surveys);
 
-                        for(int i=0;i<mdetails.size();i++){
+                        for (int i = 0; i < mdetails.size(); i++) {
                             mdetails.get(i).setSurveyid(String.valueOf(masterId));
-                            RuntimeExceptionDao<ParamDetails,Integer> paramDetailsDao=mDbHelper.getParamDetailsRuntimeDao();
+                            RuntimeExceptionDao<ParamDetails, Integer> paramDetailsDao = mDbHelper.getParamDetailsRuntimeDao();
                             paramDetailsDao.create(mdetails.get(i));
                         }
+                        /*// i am added new line here for m headers added
+                        for(int i=0; i< mheaders.size(); i++)
+                        {
+                            headers.setSurveyid(masterId);
+                            RuntimeExceptionDao<BOQHeaders, Integer> boqHeadersdao = mDbHelper.getBoqHeadersRuntimeDao();
+                            boqHeadersdao.create(mheaders.get(i));
+                        }*/
 
+                        // i am comment this code and added top
                         headers.setSurveyid(masterId);
-                        RuntimeExceptionDao<BOQHeaders,Integer> boqHeadersdao=mDbHelper.getBoqHeadersRuntimeDao();
-                        boqHeadersdao.create(headers);
+                        RuntimeExceptionDao<BOQHeaders, Integer> boqHeadersdao = mDbHelper.getBoqHeadersRuntimeDao();
+                        boqHeadersdao.create(headers);//change this line to mheaders
 
-                        Log.d("mtrailers",""+mTrailers.size());
-//                        for(int i=0;i<mTrailers.size();i++){
-//                            mTrailers.get(i).setSurveyid(masterId);
-//                            RuntimeExceptionDao<BOQTrailers,Integer> boqTrailers=mDbHelper.getBoqTrailersRuntimeDao();
-//                            boqTrailers.create(mTrailers.get(i));
-//                        }
-                    // i am add new line and comment upper line
-                        trailers.setSurveyid(masterId);
-                        RuntimeExceptionDao<BOQTrailers,Integer> boqTrailersdao=mDbHelper.getBoqTrailersRuntimeDao();
-                        boqTrailersdao.create(trailers);
+                        Log.d("mtrailers", "" + mTrailers.size());
+                        for (int i = 0; i < mTrailers.size(); i++) {
+                            mTrailers.get(i).setSurveyid(masterId);
+                            RuntimeExceptionDao<BOQTrailers, Integer> boqTrailers = mDbHelper.getBoqTrailersRuntimeDao();
+                            boqTrailers.create(mTrailers.get(i));
+                        }
+                        // i am add new line and comment upper line
+//                        trailers.setSurveyid(masterId);
+//                        RuntimeExceptionDao<BOQTrailers,Integer> boqTrailersdao=mDbHelper.getBoqTrailersRuntimeDao();
+//                        boqTrailersdao.create(mTrailers); //add here mTrailers
 
 
-                        RuntimeExceptionDao<SurveyPromotions,Integer> surveyPromotionsDao=mDbHelper.getSurveyPromotionsRuntimeDao();
+                        RuntimeExceptionDao<SurveyPromotions, Integer> surveyPromotionsDao = mDbHelper.getSurveyPromotionsRuntimeDao();
                         surveyPromotionsDao.create(surveyPromotions);
 
                         Toast.makeText(Survey.this, "Saved", Toast.LENGTH_SHORT).show();
                         mdetails.clear();
+                       // mTrailers.clear();// i am added this new line
+                       // mheaders.clear();// i am added this new line
                         mMapbox.getUiSettings().setScrollGesturesEnabled(true);
                         mEnteredItemDefinitions.clear();
                         drag_marker.setText("Click the Location");
@@ -625,7 +1164,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
 
                         progres.show();
                         userLocation();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
@@ -654,16 +1193,16 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if(id==R.id.action_details){
+        if (id == R.id.action_details) {
             //Toast.makeText(this, "done", Toast.LENGTH_SHORT).show();
             //surveypoints();
-            SurveyPoints_Popup surveyPoints_popup=new SurveyPoints_Popup();
-            surveyPoints_popup.show(getSupportFragmentManager(),null);
+            SurveyPoints_Popup surveyPoints_popup = new SurveyPoints_Popup();
+            surveyPoints_popup.show(getSupportFragmentManager(), null);
         }
         if (id == R.id.action_refresh) {
             finish();
             Intent in = new Intent(Survey.this, Survey.class);
-            in.putExtra("date",day);
+            in.putExtra("date", day);
             in.putExtra("partnerid", partnerid);
             startActivity(in);
             //return true;
@@ -671,7 +1210,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         if (id == R.id.action_statusupdate) {
             Intent in1 = new Intent(Survey.this, StatusUpdate.class);
             in1.putExtra("partnerid", partnerid);
-            in1.putExtra("date",day);
+            in1.putExtra("date", day);
             in1.putExtra("Latitude", lati);
             in1.putExtra("Longitude", longi);
             startActivity(in1);
@@ -696,6 +1235,8 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         mMapbox = mapboxMap;
         mMapbox.addOnCameraIdleListener(Survey.this);
+
+
         mapboxMap.setStyle(Style.MAPBOX_STREETS,
                 new Style.OnStyleLoaded() {
                     @Override
@@ -714,31 +1255,33 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
 
     @Override
     public void onCameraIdle() {
-        if(mMapbox!=null){
+        if (mMapbox != null) {
             com.mapbox.mapboxsdk.geometry.LatLng latLng = mMapbox.getCameraPosition().target;
-            if(latLng!=null){
+            if (latLng != null) {
                 latitude = latLng.getLatitude();
                 longitude = latLng.getLongitude();
+
+
                 Geocoder geocoder = new Geocoder(Survey.this);
                 try {
-                    List<Address> addressList = geocoder.getFromLocation(latLng.getLatitude(), latLng.getLongitude(),1);
+                    List<Address> addressList = geocoder.getFromLocation(latLng.getLatitude(), latLng.getLongitude(), 1);
                     if (addressList != null && addressList.size() > 0) {
                         String locality = addressList.get(0).getAddressLine(0);
                         if (!locality.isEmpty()) {
-                            geoaddress=locality;
+                            geoaddress = locality;
                             //Toast.makeText(this, ""+locality, Toast.LENGTH_SHORT).show();
                         }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    geoaddress="not found";
+                    geoaddress = "not found";
                 }
                 //Toast.makeText(Survey.this, "" + latitude + "," + longitude, Toast.LENGTH_SHORT).show();
                 //drag_marker.setVisibility(View.GONE);
                 sur_location.setEnabled(true);
                 drag_marker.setText("Click The Location");
                 sur_location.setBackgroundColor(getResources().getColor(R.color.poym));
-            }else{
+            } else {
                 Toast.makeText(this, "Not Found", Toast.LENGTH_SHORT).show();
             }
         }
@@ -775,7 +1318,43 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
             }*//*
         }*/
     }
+
     private void userLocation() {
+
+        /* FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);*/  // i am added this one to top
+      /*  if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Task<Location> task = client.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                mMapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                        //LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+
+                        double lat = location.getLatitude();
+                        double lag = location.getLongitude();
+
+                        LatLng sou = new LatLng(lat, lag);
+
+                        com.google.android.gms.maps.model.MarkerOptions markerOptions = new com.google.android.gms.maps.model.MarkerOptions().position(sou).title("My_location");
+                        // mapboxMap.addMarker(markerOptions)
+                        //mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sou ,10));
+                    }
+                });
+
+            }
+        });*/
+
         final ProgressDialog progress = new ProgressDialog(Survey.this);
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress.setMessage("Fetching ur location,Plz Wait..");
@@ -790,6 +1369,8 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 source = new LatLng(lati, longi);
                 new FetchDetailsFromDbTask().execute();
 
+
+                //i am un comment this code
                 /*if(source!=null) {
                     if (msurvey.size() > 0) {
                         double lat = msurvey.get(0).getLatitude();
@@ -812,34 +1393,40 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                     }
                 }*/
 
-                /*CameraPosition position = new CameraPosition.Builder()
+               /* CameraPosition position = new CameraPosition.Builder()
                         .target(new com.mapbox.mapboxsdk.geometry.LatLng(lati, longi))
                         .zoom(15)
                         .tilt(20)
                         .build();
                 if(mMapbox!=null)
-                mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1000);*/
+                mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1000); */
 
-                /*try {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(source, 19));
+                /*
+
+                try {
+                    mMapbox.moveCamera(CameraUpdateFactory.newLatLngZoom(source, 19));
                 }catch (Exception e){
                     e.printStackTrace();
-                }*/
+                }
+                */
                 if (ActivityCompat.checkSelfPermission(Survey.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(Survey.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                     return;
                 }
             }
+
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
                 if (i == LocationProvider.OUT_OF_SERVICE) {
                     Toast.makeText(Survey.this, "Network Unavaliable", Toast.LENGTH_SHORT).show();
                 }
             }
+
             @Override
             public void onProviderEnabled(String s) {
                 Toast.makeText(Survey.this, "Fetching..PlzWait", Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void onProviderDisabled(String s) {
                 Toast.makeText(Survey.this, "Please enable GPS", Toast.LENGTH_SHORT).show();
@@ -859,15 +1446,15 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         for (int j = 0; j < itemcategoryid.split(",").length; j++) {
             ItemsCategory itemsCategory = null;
             itemsCategory = new ItemsCategory(0);
-            if(!itemcategoryid.split(",")[j].equalsIgnoreCase("")){
+            if (!itemcategoryid.split(",")[j].equalsIgnoreCase("")) {
                 itemsCategory = new ItemsCategory(Integer.parseInt(itemcategoryid.split(",")[j]));
             }
             for (int i = 0; i < mitemtypes.size(); i++) {
                 if (itemcategoryid.split(",")[j].equalsIgnoreCase(String.valueOf(mitemtypes.get(i).getItemcategoryId()))) {
                     //int index=mitemcategory.indexOf(itemsCategory)== -1 ? 0 :mitemcategory.indexOf(itemsCategory);
-                    for(int k=0;k<mitemcategory.size();k++){
-                        if(mitemcategory.get(k).getId().equals(Integer.valueOf(itemcategoryid.split(",")[j]))){
-                            Log.e("priority",String.valueOf(mitemcategory.get(k).getPriority()));
+                    for (int k = 0; k < mitemcategory.size(); k++) {
+                        if (mitemcategory.get(k).getId().equals(Integer.valueOf(itemcategoryid.split(",")[j]))) {
+                            Log.e("priority", String.valueOf(mitemcategory.get(k).getPriority()));
                             ItemType itemType = mitemtypes.get(i);
                             itemType.setChildpriority(mitemcategory.get(k).getPriority());
                             filtereditemtype.add(itemType);
@@ -881,12 +1468,13 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 return emp2.getChildpriority().compareTo(emp1.getChildpriority());
             }
         });
-        ItemType_Sp_Adapter adapter1 = new ItemType_Sp_Adapter(Survey.this,filtereditemtype);
+        ItemType_Sp_Adapter adapter1 = new ItemType_Sp_Adapter(Survey.this, filtereditemtype);
         LinearLayoutManager layoutManager1 = new LinearLayoutManager(Survey.this, LinearLayoutManager.HORIZONTAL, false);
         item_type_rv.setAdapter(adapter1);
 //        item_type_rv.setLayoutManager(layoutManager1);
         adapter1.notifyDataSetChanged();
     }
+
     public void ItemTypeCallingAdapter(int tasktypeid, int position) {
         ArrayList<TaskItemLinkView> filtereditemdefinition = new ArrayList<TaskItemLinkView>();
 
@@ -908,6 +1496,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         rv_ItemDefinition.setLayoutManager(manager1);
         additemRV_adapter.notifyDataSetChanged();
     }
+
     /*public void ItemsubTypeCallingAdapter(String itemsubtypeid, int position) {
         ArrayList<ItemDefinition> filtereditemdefinition = new ArrayList<ItemDefinition>();
         mIntItemSubPriority++;
@@ -939,21 +1528,21 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         additemRV_adapter.notifyDataSetChanged();
     }*/
     public void ItemCategoryEmptyAdapter() {
-        ArrayList<ItemType> empty_itemtype=new ArrayList<ItemType>();
-        ArrayList<ItemDefinition> empty_itemdef=new ArrayList<ItemDefinition>();
-        ItemType_Sp_Adapter adapter1 = new ItemType_Sp_Adapter(Survey.this,empty_itemtype);
+        ArrayList<ItemType> empty_itemtype = new ArrayList<ItemType>();
+        ArrayList<ItemDefinition> empty_itemdef = new ArrayList<ItemDefinition>();
+        ItemType_Sp_Adapter adapter1 = new ItemType_Sp_Adapter(Survey.this, empty_itemtype);
         LinearLayoutManager layoutManager1 = new LinearLayoutManager(Survey.this, LinearLayoutManager.HORIZONTAL, false);
         item_type_rv.setAdapter(adapter1);
 //        item_type_rv.setLayoutManager(layoutManager1);
         adapter1.notifyDataSetChanged();
         ItemTypeEmptyAdapter();
-        for(ItemType itemType : mitemtypes){
+        for (ItemType itemType : mitemtypes) {
             itemType.setIsselected(false);
         }
     }
 
-    public void ItemTypeEmptyAdapter(){
-        ArrayList<TaskItemLinkView> emptyitemdefinition=new ArrayList<TaskItemLinkView>();
+    public void ItemTypeEmptyAdapter() {
+        ArrayList<TaskItemLinkView> emptyitemdefinition = new ArrayList<TaskItemLinkView>();
         additemRV_adapter = new AdditemRV_Adapter(Survey.this, emptyitemdefinition,
                 mSearchOptionsDialog);
         LinearLayoutManager manager1 = new LinearLayoutManager(Survey.this, LinearLayoutManager.VERTICAL, false);
@@ -962,7 +1551,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         additemRV_adapter.notifyDataSetChanged();
     }
 
-    private void showconfirmpopup(){
+    private void showconfirmpopup() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(Survey.this);
         final View v1 = LayoutInflater.from(Survey.this).inflate(R.layout.survey_order_popup, null);
         item_category = (Spinner) v1.findViewById(R.id.item_category);
@@ -974,192 +1563,243 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         builder.setTitle("BOQ Details");
         builder.setView(v1);
         mSearchOptionsDialog = builder.create();
+
         bt_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //mSearchOptionsDialog.dismiss();
-                        AlertDialog.Builder builder1=new AlertDialog.Builder(Survey.this);
-                        View v = LayoutInflater.from(Survey.this).inflate(R.layout.confirmpopup, null);
-                        builder1.setView(v);
-                        TextView tv_message= (TextView) v.findViewById(R.id.confirm_message);
-                        Button bt_ok= (Button) v.findViewById(R.id.confirm_ok);
-                        Button bt_cancel= (Button) v.findViewById(R.id.confirm_cancel);
-                        final AlertDialog mDialog = builder1.create();
-                        bt_ok.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                mSearchOptionsDialog.dismiss();
-                                mDialog.dismiss();
-                            }
-                        });
-                        bt_cancel.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                mDialog.dismiss();
-                            }
-                        });
-                        tv_message.setText(" Complete This Order ?");
-                        builder1.setCancelable(false);
-                        mDialog.show();
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(Survey.this);
+                View v = LayoutInflater.from(Survey.this).inflate(R.layout.confirmpopup, null);
+                builder1.setView(v);
+                TextView tv_message = (TextView) v.findViewById(R.id.confirm_message);
+                Button bt_ok = (Button) v.findViewById(R.id.confirm_ok);
+                Button bt_cancel = (Button) v.findViewById(R.id.confirm_cancel);
+                final AlertDialog mDialog = builder1.create();
+                bt_ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mSearchOptionsDialog.dismiss();
+                        mDialog.dismiss();
+                    }
+                });
+                bt_cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mDialog.dismiss();
+                    }
+                });
+                tv_message.setText(" Complete This Order ?");
+                builder1.setCancelable(false);
+                mDialog.show();
             }
         });
         bt_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-             int sp =  spinnerSelectPosition;
-             int spSecond=0;
-             if (sp==1)
-             {
-               spSecond=0;
-             }
-             else if(sp==2){
-                 spSecond=2;
-             }
-             else if(sp==3){
-                 spSecond=12;
-             }
+                int sp = spinnerSelectPosition;
+                int spfirst = 0;
+                int spSecond = 0;
+                if (sp == 1) {
+                    spSecond = 0;
+                    spfirst = 0;
+                } else if (sp == 2) {
+                    spSecond = 2;
+                    spfirst = 1;
+                } else if (sp == 3) {
+                    spSecond = 14;
+                    spfirst = 3;
+                } else if (sp == 4) {
+                    spSecond = 18;
+                    spfirst = 15;
+                } else if (sp == 5) {
+                    spSecond = 19;
+                    spfirst = 19;
+                } else if (sp == 6) {
+                    spSecond = 23;
+                    spfirst = 20;
+                } else if (sp == 7) {
+                    spSecond = 24;
+                    spfirst = 24;
+                } else if (sp == 8) {
+                    spSecond = 25;
+                    spfirst = 20;
+                } else if (sp == 9) {
+                    spSecond = 38;
+                    spfirst = 26;
+                } else {
+                    spSecond = spinnerSelectPosition;
+                }
 
-                        mEnteredItemDefinitions = new ArrayList<TaskItemLinkView>();
-                        for (TaskItemLinkView itemDefinition : mitemdefinition) {
-                            if (itemDefinition.getQuantity() != null) {
-                                try {
-                                    mEnteredItemDefinitions.add(itemDefinition);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                mEnteredItemDefinitions = new ArrayList<TaskItemLinkView>();
+                for (TaskItemLinkView itemDefinition : mitemdefinition) {
+                    if (itemDefinition.getQuantity() != null) {
+                        try {
+                            mEnteredItemDefinitions.add(itemDefinition);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                        if(mEnteredItemDefinitions.size()>0){
+                    }
+                }
+                if (mEnteredItemDefinitions.size() > 0) {
 
-                           // int qty=0;
-                            int position=0;
-                            for(int j=0;j<mEnteredItemDefinitions.size();j++) {
-
-                                if(position < mEnteredItemDefinitions.size())
-                                {
-                                    position=0;
-                                }
-                                else
-                                 position=j;
-                               // qty = qty + (mEnteredItemDefinitions.get(j).getQuantity() * (mEnteredItemDefinitions.get(j).getUnitprice()));
-
-                            }
-
-                            int q=mEnteredItemDefinitions.get(sp).getQuantity();
-
-
-
+                    // int qty=0;
+//                            int position=0;
+//                            for(int j=0;j<mEnteredItemDefinitions.size();j++) {
 //
-//
-                          //  mheaders = new ArrayList<BOQHeaders>();
-                                for(int i=1;i<=spSecond;i++) {
+//                                if(position < mEnteredItemDefinitions.size())
+//                                {
+//                                    position=0;
+//                                }
+//                                else
+//                                 position=j;
+                    // qty = qty + (mEnteredItemDefinitions.get(j).getQuantity() * (mEnteredItemDefinitions.get(j).getUnitprice()));
 
 
-
-                                    TaskItemLinkView definition = mEnteredItemDefinitions.get(i);
-
-                                    int boqno = mheaders.size() <= 0 ? 1 : mheaders.size() + 1;
-
-                                    //int boqno=mEnteredItemDefinitions.get(position).getUnitprice();
-                                    long masterId = System.currentTimeMillis();
-                                    headers = new BOQHeaders();
-                                    headers.setId(masterId);
-                                    headers.setZoneId(AppPreferences.getZoneId(Survey.this));
-                                    headers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
-                                    headers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
-                                    headers.setBoqNo("BOQ " + boqno);
-                                    headers.setBoqDate(AppUtilities.getDateTime());
+                    int q = mEnteredItemDefinitions.get(sp).getQuantity();
 
 
-                                    int price = mEnteredItemDefinitions.get(position).getUnitprice();
-                                    int qua = mEnteredItemDefinitions.get(position).getQuantity();
-                                    int amount = (price * qua);
+                    // mheaders = new ArrayList<BOQHeaders>();
+                    int p = 0;
+                    //for (int i = spfirst; i <= spSecond; i++) {
+                    for (int j = 0; j < mEnteredItemDefinitions.size(); j++) {
+                        p = j;
+                    }
 
-                                    headers.setTotalamount(String.valueOf(amount));
-                                    headers.setNetamount(String.valueOf(amount));
+                    TaskItemLinkView definition = mEnteredItemDefinitions.get(p);
+
+                    int boqno = mheaders.size() <= 0 ? 1 : mheaders.size() + 1;
+
+                    //int boqno=mEnteredItemDefinitions.get(position).getUnitprice();
+                   // long masterId = System.currentTimeMillis();
+
+                    headers = new BOQHeaders();
+                    headers.setId(masterId); // this masterId i am added to top
+                    headers.setZoneId(AppPreferences.getZoneId(Survey.this));
+                    headers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
+                    headers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
+                    headers.setBoqNo("BOQ " + boqno);
+                    headers.setBoqDate(AppUtilities.getDateTime());
+
+
+                    int price = mEnteredItemDefinitions.get(p).getUnitprice();
+                    int qua = mEnteredItemDefinitions.get(p).getQuantity();
+                    int amount = (price * qua);
+
+                    headers.setTotalamount(String.valueOf(amount));
+                    headers.setNetamount(String.valueOf(amount));
 
 //                                headers.setTotalamount(String.valueOf(qty));
 //                                headers.setNetamount(String.valueOf(qty));
 
-                                    //headers.setSurveyid(masterId);
-                                    headers.setLastModifiedDate(AppUtilities.getDateTime());
-                                    headers.setInsertFlag(true);
-                                    headers.setSurveyFlag(true);
+                    //headers.setSurveyid(masterId);
+                    headers.setLastModifiedDate(AppUtilities.getDateTime());
+                    headers.setInsertFlag(true);
+                    headers.setSurveyFlag(true);
 
-                                  //  mheaders.add(headers);
-
-                                }
-                                    //postBoqHeaders();
-                           /* try {
-                                RuntimeExceptionDao<BOQHeaders,Integer> boqHeadersdao=mDbHelper.getBoqHeadersRuntimeDao();
-                                boqHeadersdao.create(headers);
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }*/
+                     // mheaders.add(headers); // i am visual this code
 
 
-                                   // mTrailers = new ArrayList<BOQTrailers>();
+                    //postBoqHeaders();
+                                  /*  try {
+                                        RuntimeExceptionDao<BOQHeaders, Integer> boqHeadersdao = mDbHelper.getBoqHeadersRuntimeDao();
 
-                                    int pos = 0;
+              \
 
-                                    for (int j = 0; j < mEnteredItemDefinitions.size(); j++) {
+                                        \\\\\\\\\\\
+                                        \
+                                       \\\\\\\\\\\\\\\\\\\\\ boqHeadersdao.create(headers);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }*/
 
-                                        if (pos < mEnteredItemDefinitions.size()) {
-                                            pos = 0;
-                                        } else
-                                            position = j;
-
-                                        //  TaskItemLinkView definition = mEnteredItemDefinitions.get(i);
-                                    }
-                                    TaskItemLinkView definition = mEnteredItemDefinitions.get(pos);
-                                    //  ItemDefinition item =mEnteredItemDefinitions.get(pos);
-                                    //int  boqn=mTrailers.size()<=0?1:mTrailers.size()+1;
-
-                                    trailers = new BOQTrailers();
-                                    trailers.setInsertFlag(true);
-                                    trailers.setId(System.currentTimeMillis());
-                                    trailers.setZoneId(AppPreferences.getZoneId(Survey.this));
-                                    trailers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
-                                    trailers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
-                           //       trailers.setBoqNo("BOQ" + boqno);
-                                    trailers.setBoqDate(AppUtilities.getDateTime());
-                                    trailers.setQuantity(String.valueOf(mEnteredItemDefinitions.get(sp).getQuantity()));
-                                    trailers.setPrice(String.valueOf(mEnteredItemDefinitions.get(sp).getUnitprice()));
-                                    int price1 = mEnteredItemDefinitions.get(position).getUnitprice();
-                                    int quan = mEnteredItemDefinitions.get(position).getQuantity();
-                                    trailers.setAmount(String.valueOf(quan * price1));
-
-                                    //   trailers.setAmount(String.valueOf(definition.getQuantity()));
-                                    // trailers.setPrice(AdditemRV_Adapter.edtqty);
-
-                                    // trailers.setItemdefinitionId(definition.getId());
-
-                                    int itemdef = mEnteredItemDefinitions.get(sp).getItemid();
-
-                                    trailers.setItemdefinitionId(itemdef);
-
-                          //          trailers.setSurveyid(masterId);
-                           //         trailers.setBoqheaderId(masterId);
-                                    trailers.setSurveyFlag(true);
+                    // }
 
 
+//                                    int pos = 0;
+//
+//                                    for (int j = 0; j < mEnteredItemDefinitions.size(); j++) {
+//
+//                                        if (pos < mEnteredItemDefinitions.size()) {
+//                                            pos = 0;
+//                                        }
 
-                               //  mTrailers.add(trailers);
+                    //  TaskItemLinkView definition = mEnteredItemDefinitions.get(i);
 
-                                //enable this comment
+                    //  TaskItemLinkView definition = mEnteredItemDefinitions.get(pos);
+                    //  ItemDefinition item =mEnteredItemDefinitions.get(pos);
+                    //int  boqn=mTrailers.size()<=0?1:mTrailers.size()+1;
+
+                    //  mTrailers = new ArrayList<BOQTrailers>();
+
+                    // for(int i=0; i<mEnteredItemDefinitions.size(); i++){
+                    for (int i = spfirst; i <= spSecond; i++) {
+                        // mTrailers = new ArrayList<BOQTrailers>(); //i am added
+                        // long masterId = System.currentTimeMillis();// not importent
+                        //  int  boqno=mTrailers.size()<=0?1:mTrailers.size()+1;
+                        trailers = new BOQTrailers();
+                        trailers.setInsertFlag(true);
+                        trailers.setId(System.currentTimeMillis());
+                        trailers.setZoneId(AppPreferences.getZoneId(Survey.this));
+                        trailers.setSalesareaId(AppPreferences.getPrefAreaId(Survey.this));
+                        trailers.setDistributionareaId(AppPreferences.getDist_Area_Id(Survey.this));
+                        trailers.setBoqNo("BOQ" + boqno);
+                        trailers.setBoqDate(AppUtilities.getDateTime());
+                        trailers.setQuantity(String.valueOf(mEnteredItemDefinitions.get(i).getQuantity()));
+                        trailers.setPrice(String.valueOf(mEnteredItemDefinitions.get(i).getUnitprice()));
+                        int price1 = mEnteredItemDefinitions.get(i).getUnitprice();
+                        int quan = mEnteredItemDefinitions.get(i).getQuantity();
+                        trailers.setAmount(String.valueOf(quan * price1));
+
+                        //   trailers.setAmount(String.valueOf(definition.getQuantity()));
+                        // trailers.setPrice(AdditemRV_Adapter.edtqty);
+
+                        // trailers.setItemdefinitionId(definition.getId());
+
+                        int itemdef = mEnteredItemDefinitions.get(i).getItemid();
+
+                        trailers.setItemdefinitionId(itemdef);
+
+                        trailers.setSurveyid(masterId);
+                        trailers.setBoqheaderId(masterId);
+                        trailers.setSurveyFlag(true);
+
+
+                        mTrailers.add(trailers);
+                        // }
+
+                        //enable this comment
                               /* try {
                                     RuntimeExceptionDao<BOQTrailers,Integer> boqTrailers=mDbHelper.getBoqTrailersRuntimeDao();
-                                    boqTrailers.create(trailers);
+                                    boqTrailers.create(mTrailers);
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }*/
+                    }
 
 
+                }
+
+                //i am added new line here copy to save
+               /* long masterId = System.currentTimeMillis();
+                    try {
+                        RuntimeExceptionDao<Surveys,Integer> surveysDao = mDbHelper.getSurveysRuntimeDao();
+                        surveysDao.create(surveys);
+
+                        Log.d("mtrailers",""+mTrailers.size());
+                        for(int i=0;i<mTrailers.size();i++){
+                            mTrailers.get(i).setSurveyid(masterId);
+                            RuntimeExceptionDao<BOQTrailers,Integer> boqTrailers=mDbHelper.getBoqTrailersRuntimeDao();
+                            boqTrailers.create(mTrailers.get(i));
                         }
-                        mSearchOptionsDialog.dismiss();
+                            }catch (Exception e){
+                        e.printStackTrace();
+                    }*/
 
-                        //show  this code
+
+                mSearchOptionsDialog.dismiss();
+
+                //show  this code
                         /*orderAddItemAdapter = new OrderAddItem_Adapter(mEnteredItemDefinitions);
                         manager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                         rvOrderedItems.setAdapter(orderAddItemAdapter);
@@ -1174,7 +1814,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 sur_save.setBackgroundColor(getResources().getColor(R.color.bottom_purple));
             }
         });
-        DistributioRouteView_Sp_Adapter adapter = new DistributioRouteView_Sp_Adapter(Survey.this,mdistrubutionRoutrViews);
+        DistributioRouteView_Sp_Adapter adapter = new DistributioRouteView_Sp_Adapter(Survey.this, mdistrubutionRoutrViews);
         LinearLayoutManager layoutManager = new LinearLayoutManager(Survey.this, LinearLayoutManager.HORIZONTAL, false);
         item_type_rv.setAdapter(adapter);
 
@@ -1202,12 +1842,12 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         item_type_rv.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position>0){
+                if (position > 0) {
 
                     spinnerSelectPosition = position;
 
-                    mdistrubutionRoutrViews.get(position-1);
-                    ItemTypeCallingAdapter(mdistrubutionRoutrViews.get(position-1).getTourtypeid(),position-1);
+                    mdistrubutionRoutrViews.get(position - 1);
+                    ItemTypeCallingAdapter(mdistrubutionRoutrViews.get(position - 1).getTourtypeid(), position - 1);
                 }
             }
 
@@ -1233,7 +1873,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 startActivity(in);
             }
         }*/
-        if(requestCode==REQUEST_IMAGE_CAPTURE && resultCode==RESULT_OK){
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             mObjDialog.show();
             new ImageCompression().execute(imagePath);
         }
@@ -1262,18 +1902,18 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
     private class FetchDetailsFromDbTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            try{
+            try {
                 RuntimeExceptionDao<Surveys, Integer> surveyDao = mDbHelper.getSurveysRuntimeDao();
                 Where<Surveys, Integer> where = surveyDao.queryBuilder().where();
                 //where.eq("zoneid",AppPreferences.getZoneId(Survey.this)), added filter
-                where.and(where.eq("areaid",AppPreferences.getPrefAreaId(Survey.this)),
-                        where.eq("distareaid",AppPreferences.getDist_Area_Id(Survey.this)));
+                where.and(where.eq("areaid", AppPreferences.getPrefAreaId(Survey.this)),
+                        where.eq("distareaid", AppPreferences.getDist_Area_Id(Survey.this)));
                 mfiltersurvey = where.query();
                 //where.eq("order","id") todo bcz of this data cant see
 
                 RuntimeExceptionDao<ParamCategories, Integer> paramCategoriesDao = mDbHelper.getParamCategoriesRuntimeDao();
-                mparamCategories=paramCategoriesDao.queryForAll();
-                Log.e("mparamCategories",""+mparamCategories.size());
+                mparamCategories = paramCategoriesDao.queryForAll();
+                Log.e("mparamCategories", "" + mparamCategories.size());
 
                 RuntimeExceptionDao<ItemsCategory, Integer> ItemsCategoryDao = mDbHelper.getItemsCategoryRuntimeDao();
                 QueryBuilder<ItemsCategory, Integer> itemsCategoryQueryBuilder = ItemsCategoryDao.queryBuilder();
@@ -1301,13 +1941,14 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
 
 
                 RuntimeExceptionDao<BOQHeaders, Integer> boqHeadersDoa = mDbHelper.getBoqHeadersRuntimeDao();
-                mheaders=boqHeadersDoa.queryForAll();
+                mheaders = boqHeadersDoa.queryForAll();
 
-                //add new line
-                RuntimeExceptionDao<BOQTrailers, Integer> boqTrailersDoa = mDbHelper.getBoqTrailersRuntimeDao();
-                mTrailers=boqTrailersDoa.queryForAll();
+//                add new line
+//                RuntimeExceptionDao<BOQTrailers, Integer> boqTrailersDoa = mDbHelper.getBoqTrailersRuntimeDao();
+//                mTrailers=boqTrailersDoa.queryForAll();
 
-            }catch (Exception e){
+
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
@@ -1317,27 +1958,42 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         protected void onPostExecute(Void result) {
             progres.dismiss();
 
-            for(Surveys survey:mfiltersurvey){
-                if(AppPreferences.getDistributionSubAreaId(Survey.this).equalsIgnoreCase("null")){
+            for (Surveys survey : mfiltersurvey) {
+                if (AppPreferences.getDistributionSubAreaId(Survey.this).equalsIgnoreCase("null")) {
                     msurvey.add(survey);
                 } else {
-                    if(Integer.valueOf(AppPreferences.getDistributionSubAreaId(Survey.this)).equals(survey.getDistsubareaid())){
+                    if (Integer.valueOf(AppPreferences.getDistributionSubAreaId(Survey.this)).equals(survey.getDistsubareaid())) {
                         msurvey.add(survey);
                     }
                 }
             }
 
-            if(source!=null) {
+            if (source != null) {
                 if (msurvey.size() > 0) {
-                    double lat = msurvey.get(0).getLatitude();
-                    double lon = msurvey.get(0).getLongitude();
-                    CameraPosition pos = new CameraPosition.Builder()
-                            .target(new com.mapbox.mapboxsdk.geometry.LatLng(lat, lon))
-                            .zoom(14)
+
+                    //i am hidding this code
+//                    double lat = msurvey.get(1).getLatitude();
+//                    double lon = msurvey.get(1).getLongitude();
+//                    String det =msurvey.get(0).getDetail(); // i am adding this line
+//                    CameraPosition pos = new CameraPosition.Builder()
+//                            .target(new com.mapbox.mapboxsdk.geometry.LatLng(lat, lon))
+//                            .zoom(14)
+//                            .tilt(20)
+//                            .build();
+//                    if (mMapbox != null)
+//                        mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(pos), 1000);
+
+                    //CurrentLocution();
+
+                    CameraPosition position = new CameraPosition.Builder()
+                            .target(new com.mapbox.mapboxsdk.geometry.LatLng(lati, longi))
+                            .zoom(15)
                             .tilt(20)
                             .build();
                     if (mMapbox != null)
-                        mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(pos), 1000);
+                        mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1000);
+
+
                 } else {
                     CameraPosition position = new CameraPosition.Builder()
                             .target(new com.mapbox.mapboxsdk.geometry.LatLng(lati, longi))
@@ -1353,6 +2009,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 mPaint.setAntiAlias(true);
                 mPaint.setDither(true);
                 mPaint.setColor(getResources().getColor(R.color.red));
+                //  mPaint.measureText(msurvey.get(msurvey.size()-1).getDetails());//i am adding this new line
                 mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
                 mPaint.setStrokeJoin(Paint.Join.ROUND);
                 mPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -1365,16 +2022,17 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 for (int i = 0; i < msurvey.size(); i++) {
                     double sur_lat = msurvey.get(i).getLatitude();
                     double sur_long = msurvey.get(i).getLongitude();
-                    //String slno= String.valueOf(i);
+                    String addtitle = msurvey.get(i).getDetail();  // i am added this new line for title name
                     LatLng sur_map = new LatLng(sur_lat, sur_long);
                     points.add(sur_map);
+
                     Bitmap.Config conf = Bitmap.Config.ARGB_8888;
                     Bitmap bmp = Bitmap.createBitmap(200, 50, conf);
                     Canvas canvas = new Canvas(bmp);
                     canvas.drawText(String.valueOf(i), 1, 50, mPaint); // paint defines the text color, stroke width, size
 
                     //TODO marker code
-                    /*mMapbox.getStyle().addImage("marker-icon-id",
+                   /* mMapbox.getStyle().addImage("marker-icon-id",
                             BitmapFactory.decodeResource(
                                     Survey.this.getResources(), R.drawable.red_dot));
 
@@ -1394,18 +2052,23 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                     //mMapbox.addMarker(new MarkerOptions().position(sur_map).icon(BitmapDescriptorFactory.fromBitmap(bmp)).anchor(0.5f, 1));
                     //mMap.addPolyline(new PolylineOptions().addAll(points).width(10).color(Color.GRAY));
 
-                    com.mapbox.mapboxsdk.geometry.LatLng latLng=new com.mapbox.mapboxsdk.geometry.LatLng(sur_lat,sur_long);
+                    com.mapbox.mapboxsdk.geometry.LatLng latLng = new com.mapbox.mapboxsdk.geometry.LatLng(sur_lat, sur_long);
                     //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.red_dot);
 
-                    IconFactory iconFactory=IconFactory.getInstance(Survey.this);
-                    Icon icon1=iconFactory.fromResource(R.drawable.red_dot);
-                    mMapbox.addMarker(new MarkerOptions().position(latLng).setIcon(icon1));
+                    IconFactory iconFactory = IconFactory.getInstance(Survey.this);
+                    Icon icon1 = iconFactory.fromResource(R.drawable.red_dot);
+
+
+                    //   mMapbox.addMarker(new MarkerOptions().position(latLng).setIcon(icon1).setTitle("hii"));
+
+
+                    mMapbox.addMarker(new MarkerOptions().position(latLng).setIcon(icon1).setTitle(addtitle));
 
 
                     //mMap.addMarker(new MarkerOptions().position(sur_map).icon(icon));
                     //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sur_map, 12));
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -1419,10 +2082,11 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
                 return null;
             return compressImage(strings[0]);
         }
+
         protected void onPostExecute(String imagePath) {
             mObjDialog.dismiss();
-            Intent in=new Intent(Survey.this,CameraActivity.class);
-            in.putExtra("imagepath",imagePath);
+            Intent in = new Intent(Survey.this, CameraActivity.class);
+            in.putExtra("imagepath", imagePath);
             //in.putExtra("imagename",imagename);
             startActivity(in);
             //captureImage.setImageBitmap(BitmapFactory.decodeFile(new File(imagePath).getAbsolutePath()));
@@ -1535,7 +2199,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
         if (!imageFile.exists()) {
             imageFile.mkdirs();
         }
-        String imageName = "Ptm"+String.valueOf(AppUtilities.getDateandTimeString())+".jpg";
+        String imageName = "Ptm" + String.valueOf(AppUtilities.getDateandTimeString()) + ".jpg";
         String uri = (imageFile.getAbsolutePath() + "/" + imageName);
         return uri;
     }
@@ -1549,7 +2213,7 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
     }
 
     @Override
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     protected void onStart() {
         super.onStart();
         mMapView.onStart();
@@ -1598,12 +2262,12 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
     private void endProgress(final String message) {
         progressBar.setIndeterminate(false);
         progressBar.setVisibility(View.GONE);
-        AppPreferences.setofflineSuccess(Survey.this,true);
+        AppPreferences.setofflineSuccess(Survey.this, true);
         // Show a toast
         //Toast.makeText(Survey.this, message, Toast.LENGTH_LONG).show();
     }
 
-    private void DownloadRegion(){
+    private void DownloadRegion() {
 
         startProgress();
         String styleUrl = mMapbox.getStyle().getUrl();
@@ -1703,6 +2367,57 @@ public class Survey extends AppCompatActivity implements OnMapReadyCallback, Map
             return true;
         }
         return false;
+    }
+
+    public void CurrentLocution() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Task<Location> task = client.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                mMapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+
+                  double  longtit =    location.getLongitude();
+                   double latitu    =  location.getLatitude();
+                  // LatLng latitudelong = new LatLng(longtit,latitu);
+
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(new com.mapbox.mapboxsdk.geometry.LatLng(longtit, latitu))
+                                .zoom(25)
+                                .tilt(20)
+                                .build();
+                        if (mMapbox != null)
+                            mMapbox.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 1000);
+
+
+
+                    }
+                });
+
+            }
+        });
+
+    }
+
+    public void zoom(Float scaleX, Float scaleY, PointF pivot) {
+
+
+        mMapView.setPivotX(pivot.x);
+        mMapView.setPivotY(pivot.y);
+        mMapView.setScaleX(scaleX);
+        mMapView.setScaleY(scaleY);
     }
 
 }
